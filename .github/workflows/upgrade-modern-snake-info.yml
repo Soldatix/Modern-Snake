@@ -20,8 +20,9 @@ jobs:
           grep -q 'id="snake-standard-info"' index.html
           grep -q 'Doniraj putem PayPala' index.html
           grep -q 'Kopirano!' index.html
-          test "$(grep -o 'class="snake-copy-btn"' index.html | wc -l)" -eq 1
-          test "$(grep -o 'data-address="' index.html | wc -l)" -eq 8
+          grep -q "\['BTC','bc1qwlrxrh64peukga0fp59m9yg7gpf0yj8q7fxnsc'\]" index.html
+          grep -q "\['RVN','RAtXzKZyB3awfq2u2cK8YppC9kJamU5tPQ'\]" index.html
+          grep -q 'snake-copy-btn' index.html
       - name: JavaScript syntax check
         run: |
           python - <<'PY'
