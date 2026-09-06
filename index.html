@@ -74,18 +74,28 @@
   .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:50;background:#12213e;border:1px solid var(--line);box-shadow:var(--shadow);padding:11px 16px;border-radius:14px;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
   @media(max-width:880px){.hero,.game-layout{grid-template-columns:1fr}.game-side{grid-template-columns:1fr 1fr}.controls-card{border-top:0;border-left:1px solid var(--line);padding-top:0;padding-left:14px}.canvas-wrap{max-height:none}.mobile-controls{display:grid}.keys{display:none}}
   @media(max-width:620px){.topbar{padding:10px}.brand span:last-child{display:none}.top-actions{gap:6px}.lang{width:116px}.pill-btn{padding:0 10px}.hero{gap:12px}.intro,.side-card{padding:18px}h1{font-size:54px;letter-spacing:-3px}.form-row{grid-template-columns:1fr}.hud{grid-template-columns:repeat(2,1fr)}.game-card{padding:8px}.game-side{grid-template-columns:1fr}.controls-card{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:14px}.stat-value{font-size:18px}.canvas-wrap{border-radius:14px}.icon-btn{width:39px;height:39px}.pill-btn,.lang{height:39px;min-height:39px}.rank-list{min-height:auto}}
-  @media(max-height:720px) and (orientation:landscape){main{display:block}.shell{margin:auto}.game-layout{grid-template-columns:minmax(0,1fr) 250px}.canvas-wrap{max-height:70dvh}.mobile-controls{display:none}.game-side{display:block}.controls-card{margin-top:10px}.keys{display:grid}}
-  /* Touch tablets in landscape: keep the board compact and always show virtual controls. */
+  @media(max-height:720px) and (orientation:landscape){main{display:block}.shell{margin:auto}.game-layout{grid-template-columns:minmax(0,1fr) 250px}.canvas-wrap{max-height:70vh;max-height:70dvh}.mobile-controls{display:none}.game-side{display:block}.controls-card{margin-top:10px}.keys{display:grid}}
+  /* Touch tablets in landscape: compact one-screen layout, with old-browser vh fallback. */
   @media (pointer:coarse) and (orientation:landscape) and (min-width:700px), (hover:none) and (orientation:landscape) and (min-width:700px){
-    main{display:block;padding-top:6px}
+    .topbar{padding-top:8px;padding-bottom:8px}
+    main{display:block;padding:4px 10px 8px}
     .shell{margin:auto}
-    .game-layout{grid-template-columns:minmax(0,1fr) 230px;gap:12px}
-    .game-card{padding:10px}
-    .canvas-wrap{width:min(58dvh,560px,100%);max-height:58dvh;margin-inline:auto}
-    .mobile-controls{display:grid !important;grid-template-columns:repeat(3,56px);gap:7px;padding-top:8px}
-    .dir-btn{height:50px}
-    .game-side{display:grid;grid-template-columns:1fr;gap:10px;padding:12px}
-    .controls-card{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:10px;margin-top:0}
+    .game-layout{grid-template-columns:minmax(0,1fr) 220px;gap:10px;align-items:start}
+    .game-card{padding:8px}
+    .hud{gap:5px;margin-bottom:6px}
+    .stat{padding:6px 8px;border-radius:11px}
+    .stat-label{font-size:9px}
+    .stat-value{font-size:16px}
+    .bonus-bar{min-height:34px;padding:6px 10px;margin-bottom:6px;font-size:12px}
+    .mouse-status{padding:6px 9px;margin-bottom:6px;font-size:12px}
+    .canvas-wrap{width:52vh;max-width:460px;max-height:52vh;margin-inline:auto}
+    .mobile-controls{display:grid !important;grid-template-columns:repeat(3,48px);gap:6px;padding-top:6px}
+    .dir-btn{height:44px;border-radius:12px;font-size:19px}
+    .game-side{display:grid;grid-template-columns:1fr;gap:8px;padding:10px}
+    .menu-buttons{gap:7px}
+    .menu-buttons button{min-height:40px}
+    .controls-card{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:8px;margin-top:0}
+    .controls-card .section-title{margin-bottom:4px}
     .keys{display:none !important}
   }
   @media (pointer:coarse), (hover:none){.mobile-controls{display:grid}.keys{display:none}}
