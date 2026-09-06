@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1020" />
+<title>Modern Snake</title>
+<style>
+  :root{
+    --bg:#07101d; --bg2:#0d1730; --panel:rgba(13,23,48,.78); --panel2:rgba(18,32,64,.92);
+    --text:#eef5ff; --muted:#9fb0c8; --line:rgba(255,255,255,.10);
+    --accent:#63f5a4; --accent2:#4dc9ff; --danger:#ff607d; --gold:#ffd76a;
+    --shadow:0 22px 60px rgba(0,0,0,.45); --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:
+    radial-gradient(circle at 15% 15%,rgba(77,201,255,.14),transparent 28%),
+    radial-gradient(circle at 85% 20%,rgba(99,245,164,.12),transparent 28%),
+    linear-gradient(160deg,var(--bg),var(--bg2));color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden}
+  body{min-height:100vh;min-height:100dvh}
+  button,input,select{font:inherit}
+  button{border:0;cursor:pointer}
+  .app{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px clamp(14px,3vw,28px);position:relative;z-index:5}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.4px}
+  .brand-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 26px rgba(99,245,164,.25);position:relative}
+  .brand-mark:before,.brand-mark:after{content:"";position:absolute;background:#07101d;border-radius:50%}
+  .brand-mark:before{width:6px;height:6px;left:10px;top:8px}.brand-mark:after{width:6px;height:6px;right:8px;top:13px}
+  .top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  .icon-btn,.pill-btn{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line);backdrop-filter:blur(10px);box-shadow:0 8px 22px rgba(0,0,0,.12);transition:.18s ease}
+  .icon-btn:hover,.pill-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.11)}
+  .icon-btn{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:19px}
+  .pill-btn{min-height:42px;padding:0 14px;border-radius:14px;font-weight:750}
+  .lang{height:42px;border-radius:14px;background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line);padding:0 34px 0 12px;outline:none}
+  .lang option{color:#111}
+  main{flex:1;display:grid;place-items:center;padding:10px 14px 24px}
+  .shell{width:min(1120px,100%)}
+  .screen{display:none}.screen.active{display:block}
+  .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.75fr);gap:22px;align-items:stretch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+  .intro{padding:clamp(24px,5vw,48px);position:relative;overflow:hidden}
+  .intro:before{content:"";position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(99,245,164,.17),transparent 65%);right:-80px;top:-80px}
+  h1{font-size:clamp(48px,8vw,92px);line-height:.92;margin:0 0 16px;letter-spacing:-4px}
+  .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{color:var(--muted);font-size:clamp(16px,2vw,19px);line-height:1.6;margin:0 0 28px;max-width:640px}
+  .form-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px}
+  .name-input{height:54px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);padding:0 16px;outline:none;font-weight:750;font-size:16px}
+  .name-input:focus{border-color:rgba(99,245,164,.55);box-shadow:0 0 0 4px rgba(99,245,164,.08)}
+  .primary,.secondary,.danger{min-height:54px;border-radius:16px;padding:0 20px;font-weight:900;transition:.18s ease}
+  .primary{background:linear-gradient(135deg,var(--accent),#39d98a);color:#052013;box-shadow:0 12px 26px rgba(57,217,138,.20)}
+  .primary:hover{transform:translateY(-2px);filter:brightness(1.03)}
+  .secondary{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
+  .danger{background:rgba(255,96,125,.10);color:#ff9aad;border:1px solid rgba(255,96,125,.22)}
+  .continue-btn{width:100%;margin-top:10px}
+  .tip{margin-top:20px;color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:flex-start}
+  .side-card{padding:22px;display:flex;flex-direction:column;gap:18px}
+  .section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.section-title h2{font-size:17px;margin:0}.small{font-size:12px;color:var(--muted)}
+  .rank-list{display:grid;gap:8px;min-height:230px}
+  .rank-item{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.035)}
+  .rank-no{font-weight:900;color:var(--gold)}.rank-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rank-score{font-variant-numeric:tabular-nums;font-weight:900}.empty{color:var(--muted);padding:22px 8px;text-align:center}
+  .setting-box{border-top:1px solid var(--line);padding-top:14px;display:grid;gap:10px}
+  .setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}.control-select{min-width:168px;height:38px;border-radius:12px;background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line);padding:0 10px;outline:none}.control-select option{color:#111}.mouse-status{margin:0 0 12px;padding:9px 12px;border:1px solid var(--line);border-radius:13px;background:rgba(77,201,255,.06);color:#dbe7f7;text-align:center;font-size:13px;line-height:1.35}.mouse-status.hidden{display:none}.mouse-status strong{color:var(--accent2)}.switch{width:50px;height:28px;border-radius:99px;background:rgba(255,255,255,.10);position:relative;border:1px solid var(--line);transition:.2s}.switch:after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;left:3px;top:3px;background:#fff;transition:.2s}.switch.on{background:rgba(99,245,164,.30);border-color:rgba(99,245,164,.4)}.switch.on:after{left:25px;background:var(--accent)}
+  .game-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:18px;align-items:start}
+  .game-card{padding:14px;position:relative;overflow:hidden}
+  .hud{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+  .stat{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:10px 12px}.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.stat-value{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .canvas-wrap{position:relative;width:100%;aspect-ratio:1/1;max-height:72dvh;border-radius:20px;overflow:hidden;background:#b9dcf2;border:1px solid rgba(255,255,255,.24);box-shadow:inset 0 0 42px rgba(8,35,58,.16)}
+  canvas{width:100%;height:100%;display:block;touch-action:none}
+  .overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(3,8,16,.68);backdrop-filter:blur(6px);padding:20px;text-align:center}.overlay.show{display:grid}.overlay-box{width:min(400px,100%);background:rgba(11,18,35,.92);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:var(--shadow)}.overlay-box h2{font-size:32px;margin:0 0 8px}.overlay-box p{color:var(--muted);margin:0 0 18px;line-height:1.55}.overlay-actions{display:grid;gap:9px}
+  .game-side{padding:16px;display:grid;gap:12px}.menu-buttons{display:grid;gap:9px}.menu-buttons button{min-height:46px;border-radius:14px;font-weight:850}
+  .controls-card{border-top:1px solid var(--line);padding-top:14px}.keys{display:grid;grid-template-columns:repeat(3,44px);gap:6px;justify-content:center;margin:10px 0}.key{height:42px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-weight:900;color:var(--muted)}.key.up{grid-column:2}.key.left{grid-column:1}.key.down{grid-column:2}.key.right{grid-column:3}
+  .mobile-controls{display:none;grid-template-columns:repeat(3,58px);gap:8px;justify-content:center;padding-top:12px}.dir-btn{height:54px;border-radius:15px;background:rgba(255,255,255,.08);color:var(--text);border:1px solid var(--line);font-size:21px;font-weight:900;touch-action:manipulation}.dir-btn[data-dir="up"]{grid-column:2}.dir-btn[data-dir="left"]{grid-column:1}.dir-btn[data-dir="down"]{grid-column:2}.dir-btn[data-dir="right"]{grid-column:3}
+  .modal{position:fixed;inset:0;z-index:20;background:rgba(1,5,12,.74);backdrop-filter:blur(9px);display:none;place-items:center;padding:18px}.modal.show{display:grid}.modal-card{width:min(760px,100%);max-height:86dvh;overflow:auto;background:var(--panel2);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:-22px;background:var(--panel2);padding:18px 0 12px;z-index:2}.modal-head h2{margin:0}.close{width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line);font-size:20px}.info-text{color:#dbe7f7;line-height:1.65;word-break:break-word}.info-text h3{margin:18px 0 7px;color:var(--text)}.info-text p{margin:7px 0}.info-text .wallets{white-space:pre-wrap;margin-top:12px}.info-text a{color:var(--accent2);text-decoration:none}.info-text code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;word-break:break-all;color:#b9ffd8}.rules-brief{margin-top:14px;padding:13px 14px;border:1px solid var(--line);border-radius:15px;background:rgba(99,245,164,.055);display:grid;gap:7px;color:#dbe7f7;font-size:13px;line-height:1.45}.rules-brief strong{color:var(--accent)}.bonus-bar{margin:0 0 12px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.045);display:flex;align-items:center;justify-content:center;text-align:center;min-height:44px;font-size:14px;font-weight:700;color:#dbe7f7}.bonus-bar.hidden{display:none}.bonus-bar strong{color:var(--gold)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:50;background:#12213e;border:1px solid var(--line);box-shadow:var(--shadow);padding:11px 16px;border-radius:14px;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+  @media(max-width:880px){.hero,.game-layout{grid-template-columns:1fr}.game-side{grid-template-columns:1fr 1fr}.controls-card{border-top:0;border-left:1px solid var(--line);padding-top:0;padding-left:14px}.canvas-wrap{max-height:none}.mobile-controls{display:grid}.keys{display:none}}
+  @media(max-width:620px){.topbar{padding:10px}.brand span:last-child{display:none}.top-actions{gap:6px}.lang{width:116px}.pill-btn{padding:0 10px}.hero{gap:12px}.intro,.side-card{padding:18px}h1{font-size:54px;letter-spacing:-3px}.form-row{grid-template-columns:1fr}.hud{grid-template-columns:repeat(2,1fr)}.game-card{padding:8px}.game-side{grid-template-columns:1fr}.controls-card{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:14px}.stat-value{font-size:18px}.canvas-wrap{border-radius:14px}.icon-btn{width:39px;height:39px}.pill-btn,.lang{height:39px;min-height:39px}.rank-list{min-height:auto}}
+  @media(max-height:720px) and (orientation:landscape){main{display:block}.shell{margin:auto}.game-layout{grid-template-columns:minmax(0,1fr) 250px}.canvas-wrap{max-height:70dvh}.mobile-controls{display:none}.game-side{display:block}.controls-card{margin-top:10px}.keys{display:grid}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark" aria-hidden="true"></div><span>Modern Snake</span></div>
+    <div class="top-actions">
+      <select id="languageSelect" class="lang" aria-label="Language">
+        <option value="en">English</option><option value="hr">Hrvatski</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="es">Español</option>
+      </select>
+      <button id="soundTop" class="icon-btn" type="button" title="Sound">🔊</button>
+      <button id="fullscreenTop" class="icon-btn" type="button" title="Fullscreen">⛶</button>
+      <button id="infoTop" class="pill-btn" type="button">ⓘ <span data-i18n="info">Info</span></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="shell">
+      <section id="menuScreen" class="screen active">
+        <div class="hero">
+          <div class="card intro">
+            <h1><span class="accent">SNAKE</span><br><span data-i18n="modernEdition">Modern Edition</span></h1>
+            <p class="lead" data-i18n="tagline">A fast, clean and modern take on the classic Snake. Eat, grow and climb the leaderboard.</p>
+            <div class="form-row">
+              <input id="playerName" class="name-input" maxlength="18" autocomplete="nickname" placeholder="Player name" data-i18n-placeholder="playerName" />
+              <button id="newGameBtn" class="primary" type="button" data-i18n="newGame">New Game</button>
+            </div>
+            <button id="continueBtn" class="secondary continue-btn" type="button" data-i18n="continueGame" hidden>Continue saved game</button>
+            <div class="tip">⌨️ <span data-i18n="tip">Use Arrow keys or WASD. On mobile, swipe or use the on-screen controls.</span></div>
+            <div class="rules-brief">
+              <div>🎯 <strong data-i18n="goalLabel">Goal:</strong> <span data-i18n="goalBrief">Eat the golden food, grow the snake and score as many points as possible.</span></div>
+              <div>❤️ <strong data-i18n="livesLabel">Lives:</strong> <span data-i18n="livesBrief">You start with 3 lives. Hitting a wall or your own body costs one life.</span></div>
+              <div>⭐ <strong data-i18n="bonusLabel">Bonus:</strong> <span data-i18n="bonusBrief">Temporary bonus food appears for a few seconds. Hearts give an extra life, stars give bonus points.</span></div>
+            </div>
+          </div>
+          <aside class="card side-card">
+            <div>
+              <div class="section-title"><h2 data-i18n="leaderboard">Leaderboard</h2><span class="small" data-i18n="topTen">Top 10</span></div>
+              <div id="menuLeaderboard" class="rank-list"></div>
+            </div>
+            <div class="setting-box">
+              <div class="setting-row"><span data-i18n="sound">Sound</span><button id="soundSwitch" class="switch" type="button" aria-label="Sound"></button></div>
+              <div class="setting-row"><span data-i18n="controlMode">Control</span><select id="controlModeSelect" class="control-select" aria-label="Control mode"><option value="keyboard" data-i18n="controlKeyboard">Keyboard</option><option value="mouse" data-i18n="controlMouse">Mouse</option><option value="both" data-i18n="controlBoth">Keyboard + Mouse</option></select></div>
+              <div class="setting-row"><span data-i18n="fullscreenPreference">Open game in fullscreen</span><button id="fullscreenSwitch" class="switch" type="button" aria-label="Fullscreen preference"></button></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen">
+        <div class="game-layout">
+          <div class="card game-card">
+            <div class="hud">
+              <div class="stat"><div class="stat-label" data-i18n="player">Player</div><div class="stat-value" id="hudPlayer">—</div></div>
+              <div class="stat"><div class="stat-label" data-i18n="score">Score</div><div class="stat-value" id="hudScore">0</div></div>
+              <div class="stat"><div class="stat-label" data-i18n="best">Best</div><div class="stat-value" id="hudBest">0</div></div>
+              <div class="stat"><div class="stat-label" data-i18n="level">Level</div><div class="stat-value" id="hudLevel">1</div></div>
+              <div class="stat"><div class="stat-label" data-i18n="lives">Lives</div><div class="stat-value" id="hudLives">❤️❤️❤️</div></div>
+            </div>
+            <div id="bonusBar" class="bonus-bar hidden" aria-live="polite"></div>
+            <div id="mouseStatus" class="mouse-status hidden" aria-live="polite"></div>
+            <div class="canvas-wrap">
+              <canvas id="gameCanvas" width="720" height="720" aria-label="Snake game"></canvas>
+              <div id="gameOverlay" class="overlay">
+                <div class="overlay-box">
+                  <h2 id="overlayTitle">Game Over</h2>
+                  <p id="overlayText"></p>
+                  <div class="overlay-actions">
+                    <button id="playAgainOverlay" class="primary" type="button" data-i18n="playAgain">Play again</button>
+                    <button id="menuOverlay" class="secondary" type="button" data-i18n="backToMenu">Back to menu</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mobile-controls" aria-label="Mobile controls">
+              <button class="dir-btn" data-dir="up" type="button">▲</button>
+              <button class="dir-btn" data-dir="left" type="button">◀</button>
+              <button class="dir-btn" data-dir="down" type="button">▼</button>
+              <button class="dir-btn" data-dir="right" type="button">▶</button>
+            </div>
+          </div>
+          <aside class="card game-side">
+            <div class="menu-buttons">
+              <button id="pauseBtn" class="secondary" type="button" data-i18n="pause">Pause</button>
+              <button id="saveExitBtn" class="primary" type="button" data-i18n="saveExit">Save & Exit</button>
+              <button id="exitNoSaveBtn" class="danger" type="button" data-i18n="exitNoSave">Exit without save</button>
+            </div>
+            <div class="controls-card">
+              <div class="section-title"><h2 data-i18n="controls">Controls</h2></div>
+              <div class="keys"><div class="key up">↑</div><div class="key left">←</div><div class="key down">↓</div><div class="key right">→</div></div>
+              <div class="small" style="text-align:center" data-i18n="pauseHint">Space = Pause</div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="infoModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+  <div class="modal-card">
+    <div class="modal-head"><h2 id="infoTitle">Information / Donations</h2><button id="closeInfo" class="close" type="button">×</button></div>
+    <div id="infoContent" class="info-text"></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const STORAGE = {
+    settings: 'modernSnake.settings.v1',
+    save: 'modernSnake.save.v1',
+    scores: 'modernSnake.scores.v1'
+  };
+  const DEFAULT_SETTINGS = { lang:'en', sound:true, fullscreenPref:false, playerName:'', controlMode:'both' };
+  const GRID = 24;
+  const START_LIVES = 3;
+  const START_STEP_MS = 210;
+  const MIN_STEP_MS = 75;
+  const BONUS_SPAWN_EVERY = 5;
+  const BONUS_LIFE_SCORE_FALLBACK = 100;
+
+  const translations = {
+    en:{modernEdition:'Modern Edition',tagline:'A fast, clean and modern take on the classic Snake. Eat, grow and climb the leaderboard.',playerName:'Player name',newGame:'New Game',continueGame:'Continue saved game',tip:'Use Arrow keys or WASD. On mobile, swipe or use the on-screen controls.',leaderboard:'Leaderboard',topTen:'Top 10',sound:'Sound',fullscreenPreference:'Open game in fullscreen',info:'Info',player:'Player',score:'Score',best:'Best',level:'Level',pause:'Pause',resume:'Resume',saveExit:'Save & Exit',exitNoSave:'Exit without save',controls:'Controls',pauseHint:'Space = Pause',playAgain:'Play again',backToMenu:'Back to menu',gameOver:'Game Over',finalScore:'Final score: {score}',paused:'Paused',pausedText:'Press Space or Resume to continue.',saved:'Game saved.',needName:'Enter a player name.',noScores:'No scores yet. Be the first!',savedGame:'Saved game available',newGameConfirm:'Starting a new game will keep your saved game until you overwrite it with Save & Exit.',exitConfirm:'Exit this game without saving current progress?',fullscreenBlocked:'Fullscreen can be activated after a click or tap.',continue:'Continue'},
+    hr:{modernEdition:'Moderno izdanje',tagline:'Brza, čista i moderna verzija klasične igre Snake. Jedi, rasti i popni se na rang-listi.',playerName:'Ime igrača',newGame:'Nova igra',continueGame:'Nastavi spremljenu igru',tip:'Koristi strelice ili WASD. Na mobitelu povuci prstom ili koristi tipke na zaslonu.',leaderboard:'Rang-lista',topTen:'Top 10',sound:'Zvuk',fullscreenPreference:'Otvori igru preko cijelog zaslona',info:'Info',player:'Igrač',score:'Rezultat',best:'Najbolje',level:'Razina',pause:'Pauza',resume:'Nastavi',saveExit:'Spremi i izađi',exitNoSave:'Izađi bez spremanja',controls:'Kontrole',pauseHint:'Razmaknica = Pauza',playAgain:'Igraj ponovo',backToMenu:'Povratak u izbornik',gameOver:'Kraj igre',finalScore:'Konačni rezultat: {score}',paused:'Pauzirano',pausedText:'Pritisni razmaknicu ili Nastavi za nastavak.',saved:'Igra je spremljena.',needName:'Upiši ime igrača.',noScores:'Još nema rezultata. Budi prvi!',savedGame:'Dostupna je spremljena igra',newGameConfirm:'Nova igra neće obrisati spremljenu igru dok je ne prepišeš opcijom Spremi i izađi.',exitConfirm:'Izaći iz ove igre bez spremanja trenutačnog napretka?',fullscreenBlocked:'Puni zaslon može se uključiti nakon klika ili dodira.',continue:'Nastavi'},
+    de:{modernEdition:'Moderne Edition',tagline:'Eine schnelle, klare und moderne Version des klassischen Snake. Fressen, wachsen und die Bestenliste erklimmen.',playerName:'Spielername',newGame:'Neues Spiel',continueGame:'Gespeichertes Spiel fortsetzen',tip:'Pfeiltasten oder WASD verwenden. Auf dem Handy wischen oder die Bildschirmtasten benutzen.',leaderboard:'Bestenliste',topTen:'Top 10',sound:'Ton',fullscreenPreference:'Spiel im Vollbild öffnen',info:'Info',player:'Spieler',score:'Punkte',best:'Bestwert',level:'Level',pause:'Pause',resume:'Fortsetzen',saveExit:'Speichern & Beenden',exitNoSave:'Beenden ohne Speichern',controls:'Steuerung',pauseHint:'Leertaste = Pause',playAgain:'Nochmal spielen',backToMenu:'Zurück zum Menü',gameOver:'Spiel vorbei',finalScore:'Endstand: {score}',paused:'Pausiert',pausedText:'Leertaste oder Fortsetzen drücken, um weiterzuspielen.',saved:'Spiel gespeichert.',needName:'Bitte Spielernamen eingeben.',noScores:'Noch keine Ergebnisse. Sei der Erste!',savedGame:'Gespeichertes Spiel verfügbar',newGameConfirm:'Ein neues Spiel behält den vorhandenen Spielstand, bis du ihn mit Speichern & Beenden überschreibst.',exitConfirm:'Dieses Spiel ohne Speichern des aktuellen Fortschritts verlassen?',fullscreenBlocked:'Vollbild kann nach einem Klick oder Tippen aktiviert werden.',continue:'Fortsetzen'},
+    it:{modernEdition:'Edizione moderna',tagline:'Una versione veloce, pulita e moderna del classico Snake. Mangia, cresci e scala la classifica.',playerName:'Nome giocatore',newGame:'Nuova partita',continueGame:'Continua partita salvata',tip:'Usa le frecce o WASD. Su mobile scorri oppure usa i controlli sullo schermo.',leaderboard:'Classifica',topTen:'Top 10',sound:'Audio',fullscreenPreference:'Apri il gioco a schermo intero',info:'Info',player:'Giocatore',score:'Punteggio',best:'Record',level:'Livello',pause:'Pausa',resume:'Continua',saveExit:'Salva ed esci',exitNoSave:'Esci senza salvare',controls:'Comandi',pauseHint:'Spazio = Pausa',playAgain:'Gioca ancora',backToMenu:'Torna al menu',gameOver:'Game Over',finalScore:'Punteggio finale: {score}',paused:'In pausa',pausedText:'Premi Spazio o Continua per riprendere.',saved:'Partita salvata.',needName:'Inserisci il nome del giocatore.',noScores:'Nessun punteggio. Sii il primo!',savedGame:'Partita salvata disponibile',newGameConfirm:'Una nuova partita manterrà il salvataggio esistente finché non lo sovrascrivi con Salva ed esci.',exitConfirm:'Uscire senza salvare i progressi attuali?',fullscreenBlocked:'Lo schermo intero può essere attivato dopo un clic o un tocco.',continue:'Continua'},
+    es:{modernEdition:'Edición moderna',tagline:'Una versión rápida, limpia y moderna del clásico Snake. Come, crece y sube en la clasificación.',playerName:'Nombre del jugador',newGame:'Nueva partida',continueGame:'Continuar partida guardada',tip:'Usa las flechas o WASD. En móvil, desliza el dedo o usa los controles en pantalla.',leaderboard:'Clasificación',topTen:'Top 10',sound:'Sonido',fullscreenPreference:'Abrir el juego en pantalla completa',info:'Info',player:'Jugador',score:'Puntuación',best:'Récord',level:'Nivel',pause:'Pausa',resume:'Continuar',saveExit:'Guardar y salir',exitNoSave:'Salir sin guardar',controls:'Controles',pauseHint:'Espacio = Pausa',playAgain:'Jugar de nuevo',backToMenu:'Volver al menú',gameOver:'Fin de la partida',finalScore:'Puntuación final: {score}',paused:'En pausa',pausedText:'Pulsa Espacio o Continuar para seguir.',saved:'Partida guardada.',needName:'Introduce el nombre del jugador.',noScores:'Todavía no hay puntuaciones. ¡Sé el primero!',savedGame:'Hay una partida guardada',newGameConfirm:'Una nueva partida conservará el guardado existente hasta que lo sobrescribas con Guardar y salir.',exitConfirm:'¿Salir de esta partida sin guardar el progreso actual?',fullscreenBlocked:'La pantalla completa se puede activar después de un clic o toque.',continue:'Continuar'}
+  };
+
+  const extraTranslations = {
+    en:{lives:'Lives',goalLabel:'Goal:',goalBrief:'Eat the golden food, grow the snake and score as many points as possible.',livesLabel:'Lives:',livesBrief:'You start with 3 lives. Hitting a wall or your own body costs one life.',bonusLabel:'Bonus:',bonusBrief:'Temporary bonus food appears for a few seconds. Hearts give an extra life, stars give +50 points.',lifeLost:'Life lost!',livesRemaining:'Lives remaining: {lives}',wallHit:'You hit the wall.',selfHit:'You hit your own body.',infoTitle:'Information / Donations',howToPlayTitle:'Game objective',howToPlayInfo:'Eat the golden food to grow the snake and collect as many points as possible. The game gradually becomes faster as your level increases.',lifeRulesTitle:'Lives and collisions',lifeRulesInfo:'You start each new game with 3 lives. Hitting a wall or your own body costs one life. After losing a life, the snake restarts from the center while your score and level are kept. The game ends when all 3 lives are lost.',bonusTitle:'Bonus food',bonusInfo:'Temporary bonus food can appear after several normal pickups and stays visible only for a few seconds. A heart grants +1 life. If your lives are already full, that heart gives +100 points instead. A star grants +50 points. Bonus food also counts as food, so the snake grows when you collect it.',controlInfoTitle:'Control methods',controlInfo:'On a computer or laptop, control the snake with the Arrow keys or WASD. Press Space to pause or resume. On phones and tablets, swipe directly on the game board or use the on-screen direction buttons.',donationsTitle:'Donations',donationLine1:'The application is free to use, but donations are welcome.',donationLine2:'A part of the received donations will be forwarded to various charitable organizations; the largest part will be donated to institutions caring for children without adequate parental care.',donateTo:'You can make donations to:',cardPayment:'Card Payment (Stripe)',cryptoWallet:'Crypto Wallet',bonusBarLabel:'Bonus:',bonusTimeLeft:'disappears in {time}s',bonusLifeName:'Extra life',bonusScoreName:'Score +50',bonusAppeared:'Bonus food appeared!',bonusLifeToast:'+1 life',bonusLifeFullToast:'Lives full: +100 points',bonusScoreToast:'+50 bonus points'},
+    hr:{lives:'Životi',goalLabel:'Cilj:',goalBrief:'Jedi zlatnu hranu, povećavaj zmiju i osvoji što više bodova.',livesLabel:'Životi:',livesBrief:'Igru započinješ s 3 života. Udar u zid ili vlastito tijelo oduzima jedan život.',bonusLabel:'Bonus:',bonusBrief:'Privremena bonus hrana pojavljuje se na nekoliko sekundi. Srce daje dodatni život, zvjezdica donosi +50 bodova.',lifeLost:'Izgubljen život!',livesRemaining:'Preostali životi: {lives}',wallHit:'Udario si u zid.',selfHit:'Udario si u vlastito tijelo.',infoTitle:'Informacije / Donacije',howToPlayTitle:'Cilj igre',howToPlayInfo:'Jedi zlatnu hranu kako bi zmija rasla i osvoji što više bodova. Igra se postupno ubrzava kako raste razina.',lifeRulesTitle:'Životi i sudari',lifeRulesInfo:'Svaku novu igru započinješ s 3 života. Udar u zid ili vlastito tijelo oduzima jedan život. Nakon gubitka života zmija se ponovno postavlja u sredinu, a osvojeni bodovi i razina ostaju sačuvani. Igra završava kada izgubiš sva 3 života.',bonusTitle:'Bonus hrana',bonusInfo:'Privremena bonus hrana može se pojaviti nakon nekoliko pojedenih običnih zalogaja i ostaje vidljiva samo nekoliko sekundi. Srce daje +1 život. Ako već imaš puni broj života, srce umjesto toga donosi +100 bodova. Zvjezdica daje +50 bodova. Bonus hrana se računa kao hrana, pa zmija naraste kada je pokupiš.',controlInfoTitle:'Načini upravljanja',controlInfo:'Na računalu ili laptopu zmijom upravljaj strelicama ili tipkama WASD. Razmaknicom pauziraš ili nastavljaš igru. Na mobitelu i tabletu povuci prstom izravno po polju igre ili koristi tipke za smjer na zaslonu.',donationsTitle:'Donacije',donationLine1:'Aplikacija je besplatna za korištenje, ali donacije su dobrodošle.',donationLine2:'Dio primljenih donacija bit će proslijeđen različitim dobrotvornim organizacijama, a najveći dio bit će doniran ustanovama koje skrbe o djeci bez odgovarajuće roditeljske skrbi.',donateTo:'Donirati možete na:',cardPayment:'Plaćanje karticom (Stripe)',cryptoWallet:'Kripto novčanik',bonusBarLabel:'Bonus:',bonusTimeLeft:'nestaje za {time}s',bonusLifeName:'Dodatni život',bonusScoreName:'Bodovi +50',bonusAppeared:'Pojavila se bonus hrana!',bonusLifeToast:'+1 život',bonusLifeFullToast:'Životi puni: +100 bodova',bonusScoreToast:'+50 bonus bodova'},
+    de:{lives:'Leben',goalLabel:'Ziel:',goalBrief:'Friss das goldene Futter, lass die Schlange wachsen und sammle so viele Punkte wie möglich.',livesLabel:'Leben:',livesBrief:'Du startest mit 3 Leben. Eine Kollision mit der Wand oder dem eigenen Körper kostet ein Leben.',bonusLabel:'Bonus:',bonusBrief:'Zeitlich begrenztes Bonusfutter erscheint für einige Sekunden. Ein Herz gibt ein zusätzliches Leben, ein Stern bringt +50 Punkte.',lifeLost:'Leben verloren!',livesRemaining:'Verbleibende Leben: {lives}',wallHit:'Du bist gegen die Wand gestoßen.',selfHit:'Du bist gegen deinen eigenen Körper gestoßen.',infoTitle:'Informationen / Spenden',howToPlayTitle:'Spielziel',howToPlayInfo:'Friss das goldene Futter, damit die Schlange wächst, und sammle so viele Punkte wie möglich. Mit steigendem Level wird das Spiel schrittweise schneller.',lifeRulesTitle:'Leben und Kollisionen',lifeRulesInfo:'Jedes neue Spiel beginnt mit 3 Leben. Eine Kollision mit der Wand oder dem eigenen Körper kostet ein Leben. Nach einem verlorenen Leben startet die Schlange wieder in der Mitte; Punkte und Level bleiben erhalten. Das Spiel endet, wenn alle 3 Leben verloren sind.',bonusTitle:'Bonusfutter',bonusInfo:'Temporäres Bonusfutter kann nach mehreren normalen Futterstücken erscheinen und bleibt nur wenige Sekunden sichtbar. Ein Herz gewährt +1 Leben. Wenn deine Leben bereits voll sind, bringt das Herz stattdessen +100 Punkte. Ein Stern gewährt +50 Punkte. Bonusfutter zählt ebenfalls als Futter, also wächst die Schlange beim Einsammeln.',controlInfoTitle:'Steuerungsmethoden',controlInfo:'Auf einem Computer oder Laptop steuerst du die Schlange mit den Pfeiltasten oder WASD. Mit der Leertaste pausierst du das Spiel oder setzt es fort. Auf Smartphones und Tablets kannst du direkt über das Spielfeld wischen oder die Richtungstasten auf dem Bildschirm verwenden.',donationsTitle:'Spenden',donationLine1:'Die Anwendung kann kostenlos genutzt werden, Spenden sind jedoch willkommen.',donationLine2:'Ein Teil der eingegangenen Spenden wird an verschiedene gemeinnützige Organisationen weitergeleitet; der größte Teil wird an Einrichtungen gespendet, die Kinder ohne angemessene elterliche Betreuung versorgen.',donateTo:'Spenden sind möglich über:',cardPayment:'Kartenzahlung (Stripe)',cryptoWallet:'Krypto-Wallet',bonusBarLabel:'Bonus:',bonusTimeLeft:'verschwindet in {time}s',bonusLifeName:'Extra-Leben',bonusScoreName:'Punkte +50',bonusAppeared:'Bonusfutter ist erschienen!',bonusLifeToast:'+1 Leben',bonusLifeFullToast:'Leben voll: +100 Punkte',bonusScoreToast:'+50 Bonuspunkte'},
+    it:{lives:'Vite',goalLabel:'Obiettivo:',goalBrief:'Mangia il cibo dorato, fai crescere il serpente e ottieni più punti possibile.',livesLabel:'Vite:',livesBrief:'Inizi con 3 vite. Colpire un muro o il proprio corpo costa una vita.',bonusLabel:'Bonus:',bonusBrief:'Il cibo bonus temporaneo appare per pochi secondi. Il cuore dà una vita extra, la stella dà +50 punti.',lifeLost:'Vita persa!',livesRemaining:'Vite rimaste: {lives}',wallHit:'Hai colpito il muro.',selfHit:'Hai colpito il tuo corpo.',infoTitle:'Informazioni / Donazioni',howToPlayTitle:'Obiettivo del gioco',howToPlayInfo:'Mangia il cibo dorato per far crescere il serpente e ottenere più punti possibile. Il gioco diventa gradualmente più veloce con l’aumentare del livello.',lifeRulesTitle:'Vite e collisioni',lifeRulesInfo:'Ogni nuova partita inizia con 3 vite. Colpire un muro o il proprio corpo costa una vita. Dopo aver perso una vita, il serpente riparte dal centro mentre punteggio e livello vengono mantenuti. La partita termina quando perdi tutte e 3 le vite.',bonusTitle:'Cibo bonus',bonusInfo:'Il cibo bonus temporaneo può apparire dopo diversi cibi normali e rimane visibile solo per pochi secondi. Un cuore concede +1 vita. Se hai già tutte le vite, il cuore assegna invece +100 punti. Una stella concede +50 punti. Anche il cibo bonus conta come cibo, quindi il serpente cresce quando lo raccogli.',controlInfoTitle:'Metodi di controllo',controlInfo:'Su computer o laptop controlla il serpente con i tasti freccia o WASD. Premi Spazio per mettere in pausa o riprendere. Su smartphone e tablet scorri direttamente sul campo di gioco oppure usa i pulsanti direzionali sullo schermo.',donationsTitle:'Donazioni',donationLine1:'L’applicazione è gratuita, ma le donazioni sono benvenute.',donationLine2:'Una parte delle donazioni ricevute sarà destinata a varie organizzazioni benefiche; la parte maggiore sarà donata a istituzioni che si occupano di bambini privi di adeguate cure genitoriali.',donateTo:'Puoi effettuare donazioni a:',cardPayment:'Pagamento con carta (Stripe)',cryptoWallet:'Portafoglio crypto',bonusBarLabel:'Bonus:',bonusTimeLeft:'scompare tra {time}s',bonusLifeName:'Vita extra',bonusScoreName:'Punti +50',bonusAppeared:'È apparso un cibo bonus!',bonusLifeToast:'+1 vita',bonusLifeFullToast:'Vite piene: +100 punti',bonusScoreToast:'+50 punti bonus'},
+    es:{lives:'Vidas',goalLabel:'Objetivo:',goalBrief:'Come la comida dorada, haz crecer la serpiente y consigue tantos puntos como puedas.',livesLabel:'Vidas:',livesBrief:'Empiezas con 3 vidas. Chocar contra una pared o tu propio cuerpo cuesta una vida.',bonusLabel:'Bonus:',bonusBrief:'La comida bonus temporal aparece durante unos segundos. El corazón da una vida extra y la estrella aporta +50 puntos.',lifeLost:'¡Vida perdida!',livesRemaining:'Vidas restantes: {lives}',wallHit:'Has chocado contra la pared.',selfHit:'Has chocado contra tu propio cuerpo.',infoTitle:'Información / Donaciones',howToPlayTitle:'Objetivo del juego',howToPlayInfo:'Come la comida dorada para hacer crecer la serpiente y conseguir tantos puntos como sea posible. El juego se vuelve gradualmente más rápido a medida que subes de nivel.',lifeRulesTitle:'Vidas y colisiones',lifeRulesInfo:'Cada nueva partida comienza con 3 vidas. Chocar contra una pared o tu propio cuerpo cuesta una vida. Después de perder una vida, la serpiente vuelve a empezar desde el centro y se conservan la puntuación y el nivel. La partida termina cuando pierdes las 3 vidas.',bonusTitle:'Comida bonus',bonusInfo:'La comida bonus temporal puede aparecer después de varias comidas normales y solo permanece visible durante unos segundos. Un corazón otorga +1 vida. Si ya tienes todas las vidas, ese corazón da +100 puntos en su lugar. Una estrella otorga +50 puntos. La comida bonus también cuenta como comida, así que la serpiente crece cuando la recoges.',controlInfoTitle:'Métodos de control',controlInfo:'En un ordenador o portátil, controla la serpiente con las flechas o WASD. Pulsa Espacio para pausar o continuar. En teléfonos y tabletas, desliza el dedo directamente sobre el tablero o usa los botones de dirección en pantalla.',donationsTitle:'Donaciones',donationLine1:'La aplicación es gratuita, pero las donaciones son bienvenidas.',donationLine2:'Una parte de las donaciones recibidas se destinará a diversas organizaciones benéficas; la mayor parte se donará a instituciones que atienden a niños sin una atención parental adecuada.',donateTo:'Puedes realizar donaciones a:',cardPayment:'Pago con tarjeta (Stripe)',cryptoWallet:'Monedero cripto',bonusBarLabel:'Bonus:',bonusTimeLeft:'desaparece en {time}s',bonusLifeName:'Vida extra',bonusScoreName:'Puntos +50',bonusAppeared:'¡Ha aparecido comida bonus!',bonusLifeToast:'+1 vida',bonusLifeFullToast:'Vidas completas: +100 puntos',bonusScoreToast:'+50 puntos bonus'}
+  };
+  Object.keys(extraTranslations).forEach(lang => Object.assign(translations[lang], extraTranslations[lang]));
+
+  const controlTranslations = {
+    en:{tip:'Choose Keyboard, Mouse, or both on computers. Mouse control needs one click on the game board to activate. On mobile, swipe or use the on-screen controls.',controlMode:'Control',controlKeyboard:'Keyboard',controlMouse:'Mouse',controlBoth:'Keyboard + Mouse',controlInfoTitle:'Control methods',controlInfo:'On a computer or laptop you can choose Keyboard, Mouse, or Keyboard + Mouse in the main menu. Keyboard uses Arrow keys or WASD. For Mouse control, start or continue a game and click the game board once. The browser then activates Pointer Lock: the cursor disappears and moving the mouse up, down, left or right steers the snake in that direction without further clicking. Press Esc to release the mouse. In Mouse mode the snake waits while Pointer Lock is inactive; in Keyboard + Mouse mode the keyboard remains usable. Space pauses or resumes. On phones and tablets, swipe on the game board or use the on-screen direction buttons.',mouseStatusInactive:'Mouse control ready — click the game board once to activate it.',mouseStatusActive:'Mouse control active — move the mouse to steer. Press Esc to release it.',mouseStatusKeyboard:'Keyboard control active — use Arrow keys or WASD.',mouseStatusBothInactive:'Keyboard + Mouse — keyboard works now; click the game board once to activate mouse control.',pointerLockFailed:'Mouse control could not be activated. Click the game board again or use Keyboard mode.'},
+    hr:{tip:'Na računalu izaberi Tipkovnicu, Miš ili oboje. Za miš je potreban jedan klik na polje igre za aktivaciju. Na mobitelu koristi swipe ili tipke na zaslonu.',controlMode:'Upravljanje',controlKeyboard:'Tipkovnica',controlMouse:'Miš',controlBoth:'Tipkovnica + miš',controlInfoTitle:'Načini upravljanja',controlInfo:'Na računalu ili laptopu u glavnom izborniku možeš izabrati Tipkovnica, Miš ili Tipkovnica + miš. Tipkovnica koristi strelice ili WASD. Za upravljanje mišem pokreni ili nastavi igru i jednom klikni na polje igre. Preglednik tada aktivira Pointer Lock: kursor nestaje, a pomicanjem miša gore, dolje, lijevo ili desno zmija skreće u tom smjeru bez daljnjeg klikanja. Pritisni Esc za oslobađanje miša. U načinu Miš zmija čeka dok Pointer Lock nije aktivan; u načinu Tipkovnica + miš tipkovnica ostaje dostupna. Razmaknica pauzira ili nastavlja igru. Na mobitelu i tabletu koristi swipe po polju igre ili tipke za smjer na zaslonu.',mouseStatusInactive:'Upravljanje mišem je spremno — jednom klikni na polje igre za aktivaciju.',mouseStatusActive:'Upravljanje mišem je aktivno — pomiči miš za skretanje. Pritisni Esc za izlaz.',mouseStatusKeyboard:'Upravljanje tipkovnicom je aktivno — koristi strelice ili WASD.',mouseStatusBothInactive:'Tipkovnica + miš — tipkovnica već radi; jednom klikni polje igre za aktivaciju miša.',pointerLockFailed:'Upravljanje mišem nije se moglo aktivirati. Ponovno klikni polje igre ili koristi Tipkovnicu.'},
+    de:{tip:'Am Computer Tastatur, Maus oder beides wählen. Die Maussteuerung wird mit einem Klick auf das Spielfeld aktiviert. Auf Mobilgeräten wischen oder Bildschirmtasten verwenden.',controlMode:'Steuerung',controlKeyboard:'Tastatur',controlMouse:'Maus',controlBoth:'Tastatur + Maus',controlInfoTitle:'Steuerungsmethoden',controlInfo:'Auf einem Computer oder Laptop kannst du im Hauptmenü Tastatur, Maus oder Tastatur + Maus wählen. Die Tastatur verwendet Pfeiltasten oder WASD. Für die Maussteuerung ein Spiel starten oder fortsetzen und einmal auf das Spielfeld klicken. Der Browser aktiviert dann Pointer Lock: Der Mauszeiger verschwindet und Bewegungen nach oben, unten, links oder rechts lenken die Schlange ohne weitere Klicks. Mit Esc wird die Maus wieder freigegeben. Im Modus Maus wartet die Schlange, solange Pointer Lock nicht aktiv ist; im Modus Tastatur + Maus bleibt die Tastatur nutzbar. Leertaste pausiert oder setzt fort. Auf Smartphones und Tablets wischen oder die Bildschirmtasten verwenden.',mouseStatusInactive:'Maussteuerung bereit — einmal auf das Spielfeld klicken, um sie zu aktivieren.',mouseStatusActive:'Maussteuerung aktiv — Maus bewegen zum Lenken. Esc gibt die Maus frei.',mouseStatusKeyboard:'Tastatursteuerung aktiv — Pfeiltasten oder WASD verwenden.',mouseStatusBothInactive:'Tastatur + Maus — Tastatur funktioniert bereits; einmal auf das Spielfeld klicken, um die Maus zu aktivieren.',pointerLockFailed:'Maussteuerung konnte nicht aktiviert werden. Erneut auf das Spielfeld klicken oder Tastatur verwenden.'},
+    it:{tip:'Su computer scegli Tastiera, Mouse o entrambi. Il mouse richiede un clic sul campo di gioco per l’attivazione. Su mobile usa lo swipe o i controlli sullo schermo.',controlMode:'Controllo',controlKeyboard:'Tastiera',controlMouse:'Mouse',controlBoth:'Tastiera + mouse',controlInfoTitle:'Metodi di controllo',controlInfo:'Su computer o laptop puoi scegliere Tastiera, Mouse oppure Tastiera + mouse nel menu principale. La tastiera usa i tasti freccia o WASD. Per il controllo con il mouse, avvia o continua una partita e fai un solo clic sul campo di gioco. Il browser attiva Pointer Lock: il cursore scompare e muovendo il mouse su, giù, a sinistra o a destra il serpente gira in quella direzione senza altri clic. Premi Esc per liberare il mouse. In modalità Mouse il serpente attende finché Pointer Lock non è attivo; in modalità Tastiera + mouse la tastiera rimane disponibile. Spazio mette in pausa o riprende. Su smartphone e tablet usa lo swipe o i pulsanti direzionali sullo schermo.',mouseStatusInactive:'Controllo mouse pronto — fai un clic sul campo di gioco per attivarlo.',mouseStatusActive:'Controllo mouse attivo — muovi il mouse per sterzare. Premi Esc per liberarlo.',mouseStatusKeyboard:'Controllo tastiera attivo — usa le frecce o WASD.',mouseStatusBothInactive:'Tastiera + mouse — la tastiera funziona già; fai un clic sul campo per attivare il mouse.',pointerLockFailed:'Impossibile attivare il controllo mouse. Fai di nuovo clic sul campo o usa la tastiera.'},
+    es:{tip:'En ordenador elige Teclado, Ratón o ambos. El ratón requiere un clic en el tablero para activarse. En móvil, desliza el dedo o usa los controles en pantalla.',controlMode:'Control',controlKeyboard:'Teclado',controlMouse:'Ratón',controlBoth:'Teclado + ratón',controlInfoTitle:'Métodos de control',controlInfo:'En un ordenador o portátil puedes elegir Teclado, Ratón o Teclado + ratón en el menú principal. El teclado usa las flechas o WASD. Para el control con ratón, inicia o continúa una partida y haz un solo clic en el tablero. El navegador activa Pointer Lock: el cursor desaparece y al mover el ratón arriba, abajo, a la izquierda o a la derecha la serpiente gira en esa dirección sin más clics. Pulsa Esc para liberar el ratón. En el modo Ratón la serpiente espera mientras Pointer Lock no esté activo; en Teclado + ratón el teclado sigue funcionando. Espacio pausa o reanuda. En teléfonos y tabletas, desliza el dedo o usa los botones de dirección en pantalla.',mouseStatusInactive:'Control con ratón listo — haz un clic en el tablero para activarlo.',mouseStatusActive:'Control con ratón activo — mueve el ratón para dirigir. Pulsa Esc para liberarlo.',mouseStatusKeyboard:'Control con teclado activo — usa las flechas o WASD.',mouseStatusBothInactive:'Teclado + ratón — el teclado ya funciona; haz un clic en el tablero para activar el ratón.',pointerLockFailed:'No se pudo activar el control con ratón. Haz clic de nuevo en el tablero o usa el teclado.'}
+  };
+  Object.keys(controlTranslations).forEach(lang => Object.assign(translations[lang], controlTranslations[lang]));
+
+  let settings = loadJSON(STORAGE.settings, DEFAULT_SETTINGS);
+  settings = {...DEFAULT_SETTINGS, ...settings};
+  if(!['keyboard','mouse','both'].includes(settings.controlMode)) settings.controlMode='both';
+  let audioCtx = null;
+  let state = null;
+  let rafId = 0;
+  let lastStep = 0;
+  let touchStart = null;
+  let mouseAccumX = 0;
+  let mouseAccumY = 0;
+  let lastMouseTurnAt = 0;
+  let mouseLockPauseStartedAt = 0;
+  const MOUSE_TURN_THRESHOLD = 34;
+  const MOUSE_TURN_COOLDOWN = 85;
+
+  const canvas = $('#gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const mouseControlAvailable = typeof canvas.requestPointerLock === 'function' && window.matchMedia?.('(pointer:fine)').matches !== false;
+
+  function loadJSON(key, fallback){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):fallback; }catch{ return fallback; } }
+  function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function t(key, vars={}){ let s=(translations[settings.lang]||translations.en)[key] ?? translations.en[key] ?? key; return s.replace(/\{(\w+)\}/g,(_,k)=>vars[k]??''); }
+  function applyTranslations(){
+    document.documentElement.lang=settings.lang;
+    $$('[data-i18n]').forEach(el=>{ const key=el.dataset.i18n; el.textContent=t(key); });
+    $$('[data-i18n-placeholder]').forEach(el=>{ el.placeholder=t(el.dataset.i18nPlaceholder); });
+    if(state?.paused) $('#pauseBtn').textContent=t('resume'); else $('#pauseBtn').textContent=t('pause');
+    renderLeaderboard();
+    renderInfo();
+    updateHUD();
+    updateMouseStatus();
+  }
+  function persistSettings(){ saveJSON(STORAGE.settings, settings); syncSettingsUI(); }
+  function syncSettingsUI(){
+    $('#languageSelect').value=settings.lang;
+    $('#playerName').value=settings.playerName || '';
+    $('#soundSwitch').classList.toggle('on', !!settings.sound);
+    $('#fullscreenSwitch').classList.toggle('on', !!settings.fullscreenPref);
+    $('#controlModeSelect').value=settings.controlMode;
+    const controlSelect=$('#controlModeSelect');
+    const mouseOpt=controlSelect?.querySelector('option[value="mouse"]'), bothOpt=controlSelect?.querySelector('option[value="both"]');
+    if(mouseOpt) mouseOpt.disabled=!mouseControlAvailable;
+    if(bothOpt) bothOpt.disabled=!mouseControlAvailable;
+    if(controlSelect?.closest('.setting-row')) controlSelect.closest('.setting-row').style.display=mouseControlAvailable?'flex':'none';
+    $('#soundTop').textContent=settings.sound?'🔊':'🔇';
+    $('#soundTop').title=t('sound');
+  }
+  function setLanguage(lang){ settings.lang=translations[lang]?lang:'en'; persistSettings(); applyTranslations(); }
+  function toggleSound(){ settings.sound=!settings.sound; persistSettings(); if(settings.sound) beep(620,.05,.04); }
+  function toggleFullscreenPref(){ settings.fullscreenPref=!settings.fullscreenPref; persistSettings(); }
+  function keyboardEnabled(){ return settings.controlMode==='keyboard' || settings.controlMode==='both'; }
+  function mouseEnabled(){ return mouseControlAvailable && (settings.controlMode==='mouse' || settings.controlMode==='both'); }
+  function setControlMode(mode){
+    const previous=settings.controlMode;
+    settings.controlMode=['keyboard','mouse','both'].includes(mode)?mode:'both';
+    if(!mouseControlAvailable && settings.controlMode!=='keyboard') settings.controlMode='keyboard';
+    if(previous==='mouse' && settings.controlMode!=='mouse' && mouseLockPauseStartedAt){
+      if(state?.bonus) state.bonus.expiresAt += Date.now()-mouseLockPauseStartedAt;
+      mouseLockPauseStartedAt=0;
+      lastStep=performance.now();
+    }
+    persistSettings();
+    if(!mouseEnabled() && document.pointerLockElement===canvas) document.exitPointerLock?.();
+    mouseAccumX=mouseAccumY=0;
+    updateMouseStatus();
+  }
+  function updateMouseStatus(){
+    const el=$('#mouseStatus');
+    if(!el)return;
+    if(!state || !mouseControlAvailable){el.classList.add('hidden');el.textContent='';return;}
+    el.classList.remove('hidden');
+    const locked=document.pointerLockElement===canvas;
+    let msg;
+    if(settings.controlMode==='keyboard' || !mouseControlAvailable) msg=t('mouseStatusKeyboard');
+    else if(locked) msg=t('mouseStatusActive');
+    else if(settings.controlMode==='mouse') msg=t('mouseStatusInactive');
+    else msg=t('mouseStatusBothInactive');
+    el.textContent=msg;
+  }
+  async function activateMouseControl(){
+    if(!state || !mouseEnabled() || document.pointerLockElement===canvas)return;
+    try{ await canvas.requestPointerLock(); }catch{ showToast(t('pointerLockFailed')); }
+  }
+  async function toggleFullscreen(){
+    try{
+      if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    }catch{ showToast(t('fullscreenBlocked')); }
+  }
+  async function maybeFullscreen(){ if(settings.fullscreenPref && !document.fullscreenElement){ try{ await document.documentElement.requestFullscreen(); }catch{} } }
+  function beep(freq=440,dur=.06,vol=.035,type='sine'){
+    if(!settings.sound) return;
+    try{
+      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type=type;o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);o.stop(audioCtx.currentTime+dur);
+    }catch{}
+  }
+  function showToast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove('show'),1800); }
+  function showScreen(which){ $('#menuScreen').classList.toggle('active',which==='menu'); $('#gameScreen').classList.toggle('active',which==='game'); }
+  function hasSave(){ return !!localStorage.getItem(STORAGE.save); }
+  function refreshContinue(){ $('#continueBtn').hidden=!hasSave(); }
+
+  function getScores(){ const a=loadJSON(STORAGE.scores,[]); return Array.isArray(a)?a:[]; }
+  function bestScore(){ return getScores()[0]?.score || 0; }
+  function addScore(name,score){
+    if(!Number.isFinite(score) || score<=0) return;
+    const scores=getScores(); scores.push({name:name||'Player',score,date:new Date().toISOString()});
+    scores.sort((a,b)=>b.score-a.score || new Date(a.date)-new Date(b.date));
+    saveJSON(STORAGE.scores,scores.slice(0,10)); renderLeaderboard();
+  }
+  function renderLeaderboard(){
+    const scores=getScores(); const holder=$('#menuLeaderboard'); holder.innerHTML='';
+    if(!scores.length){ const e=document.createElement('div');e.className='empty';e.textContent=t('noScores');holder.appendChild(e);return; }
+    scores.slice(0,10).forEach((r,i)=>{
+      const row=document.createElement('div');row.className='rank-item';
+      const n=document.createElement('div');n.className='rank-no';n.textContent=`#${i+1}`;
+      const name=document.createElement('div');name.className='rank-name';name.textContent=r.name;
+      const sc=document.createElement('div');sc.className='rank-score';sc.textContent=r.score;
+      row.append(n,name,sc);holder.appendChild(row);
+    });
+  }
+
+  function renderInfo(){
+    const title=$('#infoTitle'), content=$('#infoContent');
+    if(!title||!content)return;
+    title.textContent=t('infoTitle');
+    content.innerHTML=`
+      <h3>🎯 ${t('howToPlayTitle')}</h3>
+      <p>${t('howToPlayInfo')}</p>
+      <h3>❤️ ${t('lifeRulesTitle')}</h3>
+      <p>${t('lifeRulesInfo')}</p>
+      <h3>⭐ ${t('bonusTitle')}</h3>
+      <p>${t('bonusInfo')}</p>
+      <h3>🎮 ${t('controlInfoTitle')}</h3>
+      <p>${t('controlInfo')}</p>
+      <h3>🤝 ${t('donationsTitle')}</h3>
+      <p>${t('donationLine1')}</p>
+      <p>${t('donationLine2')}</p>
+      <p><strong>${t('donateTo')}</strong></p>
+      <p>PayPal: <a href="https://www.paypal.com/ncp/payment/RU2CWCNVQ7XD6" target="_blank" rel="noopener">https://www.paypal.com/ncp/payment/RU2CWCNVQ7XD6</a><br>
+      ${t('cardPayment')}: <a href="https://buy.stripe.com/7sYeVd7Blfe89cm0k02kw00" target="_blank" rel="noopener">https://buy.stripe.com/7sYeVd7Blfe89cm0k02kw00</a></p>
+      <div class="wallets"><strong>${t('cryptoWallet')}:</strong>
+BTC:
+<code>bc1qwlrxrh64peukga0fp59m9yg7gpf0yj8q7fxnsc</code>
+ETH:
+<code>0xA99A52085c6725854daa46bb302041569c8bA4E3</code>
+XRP:
+<code>rP43SsrkhPkxTsFohMAm32sAQg7vqwmDpr</code>
+SOL:
+<code>8xkdVTEaDGuWu4aE3HpEx8r9Aux98JZbdsMiDQvJWBWR</code>
+DOGE:
+<code>DGAT32ku8WmFaTDxCgVuRuVpUFmfdmD5Jb</code>
+XML/XLM:
+<code>GCYH4OD4I2GNRKFFOYROE3N3S2HCT5RXIML3TZV5DP3TLTLXPXQXIJZ3</code>
+LTC:
+<code>LWtaFniqdYpv2xJtqo9WqDwCsQ2cW6PYWi</code>
+RVN:
+<code>RAtXzKZyB3awfq2u2cK8YppC9kJamU5tPQ</code></div>`;
+  }
+
+  function initialState(name){
+    const c=Math.floor(GRID/2);
+    return {player:name, snake:[{x:c,y:c},{x:c-1,y:c},{x:c-2,y:c},{x:c-3,y:c}], dir:{x:1,y:0}, nextDir:{x:1,y:0}, food:null, bonus:null, foodsEaten:0, score:0, level:1, lives:START_LIVES, paused:false, over:false, recovering:false, pauseStartedAt:0, stepMs:START_STEP_MS, startedAt:Date.now()};
+  }
+  function sameCell(a,b){ return !!a && !!b && a.x===b.x && a.y===b.y; }
+  function randomFood(snake, blocked=[]){
+    let p, tries=0;
+    do{
+      p={x:Math.floor(Math.random()*GRID),y:Math.floor(Math.random()*GRID)};
+      tries++;
+    }while((snake.some(s=>sameCell(s,p)) || blocked.some(b=>sameCell(b,p))) && tries<2000);
+    return p;
+  }
+  function recalcDifficulty(){
+    state.level=1+Math.floor(state.score/80);
+    state.stepMs=Math.max(MIN_STEP_MS,START_STEP_MS-(state.level-1)*8);
+  }
+  function createBonus(type){
+    const durationMs=type==='life'?4000:3500;
+    const pos=randomFood(state.snake,[state.food].filter(Boolean));
+    return {x:pos.x,y:pos.y,type,durationMs,expiresAt:Date.now()+durationMs};
+  }
+  function maybeSpawnBonus(){
+    if(!state || state.bonus) return;
+    if(state.foodsEaten< BONUS_SPAWN_EVERY) return;
+    if(state.foodsEaten % BONUS_SPAWN_EVERY !== 0) return;
+    const type=Math.random()<0.38?'life':'score';
+    state.bonus=createBonus(type);
+    showToast(t('bonusAppeared'));
+    beep(type==='life'?690:860,.08,.04,'triangle');
+  }
+  function expireBonusIfNeeded(){
+    if(state?.bonus && !state.paused && !state.over && !state.recovering && Date.now()>=state.bonus.expiresAt){
+      state.bonus=null;
+    }
+  }
+  function bonusName(type){ return t(type==='life'?'bonusLifeName':'bonusScoreName'); }
+  function bonusRemainingMs(){
+    if(!state?.bonus) return 0;
+    const now=state.paused && state.pauseStartedAt ? state.pauseStartedAt : Date.now();
+    return Math.max(0,state.bonus.expiresAt-now);
+  }
+  function updateBonusBar(){
+    const bar=$('#bonusBar');
+    if(!bar) return;
+    if(!state || !state.bonus || state.over){ bar.classList.add('hidden'); bar.textContent=''; return; }
+    const remaining=Math.max(0,bonusRemainingMs()/1000);
+    if(remaining<=0){ bar.classList.add('hidden'); bar.textContent=''; return; }
+    const icon=state.bonus.type==='life'?'❤️':'⭐';
+    bar.classList.remove('hidden');
+    bar.innerHTML=`${t('bonusBarLabel')} <strong>${icon} ${bonusName(state.bonus.type)}</strong> · ${t('bonusTimeLeft',{time:remaining.toFixed(1)})}`;
+  }
+  function collectBonus(){
+    if(!state?.bonus) return;
+    const type=state.bonus.type;
+    state.bonus=null;
+    if(type==='life'){
+      if((state.lives??START_LIVES) < START_LIVES){ state.lives += 1; showToast(t('bonusLifeToast')); }
+      else { state.score += BONUS_LIFE_SCORE_FALLBACK; showToast(t('bonusLifeFullToast')); recalcDifficulty(); }
+      beep(840,.06,.04,'triangle'); setTimeout(()=>beep(980,.07,.035,'triangle'),55);
+    }else{
+      state.score += 50;
+      recalcDifficulty();
+      showToast(t('bonusScoreToast'));
+      beep(980,.05,.04,'sine'); setTimeout(()=>beep(1140,.07,.035,'sine'),50);
+    }
+  }
+  async function startNew(){
+    const name=$('#playerName').value.trim(); if(!name){ showToast(t('needName')); $('#playerName').focus(); return; }
+    settings.playerName=name.slice(0,18);persistSettings();
+    state=initialState(settings.playerName);state.food=randomFood(state.snake);
+    hideOverlay(); showScreen('game'); updateHUD(); updateMouseStatus(); await maybeFullscreen(); resetLoop(); beep(520,.06,.035,'triangle');
+  }
+  async function continueSaved(){
+    const saved=loadJSON(STORAGE.save,null); if(!saved || !saved.snake) { localStorage.removeItem(STORAGE.save); refreshContinue(); return; }
+    const bonus=saved.bonus && Number.isFinite(saved.bonus.remainingMs) && saved.bonus.remainingMs>0 ? {...saved.bonus, expiresAt:Date.now()+saved.bonus.remainingMs} : null;
+    state={...saved, paused:false, over:false, recovering:false, pauseStartedAt:0, lives:Number.isFinite(saved.lives)?saved.lives:START_LIVES, nextDir:saved.nextDir||saved.dir, foodsEaten:Number.isFinite(saved.foodsEaten)?saved.foodsEaten:0, bonus, stepMs:Math.max(MIN_STEP_MS,START_STEP_MS-((saved.level||1)-1)*8)};
+    if(!state.food || state.snake.some(s=>sameCell(s,state.food))) state.food=randomFood(state.snake, bonus?[bonus]:[]);
+    if(state.bonus && (Date.now()>=state.bonus.expiresAt || sameCell(state.food,state.bonus) || state.snake.some(s=>sameCell(s,state.bonus)))) state.bonus=null;
+    settings.playerName=state.player||settings.playerName;persistSettings();
+    hideOverlay();showScreen('game');updateHUD();updateMouseStatus();await maybeFullscreen();resetLoop();beep(600,.06,.035,'triangle');
+  }
+  function resetLoop(){ cancelAnimationFrame(rafId); lastStep=performance.now(); rafId=requestAnimationFrame(loop); }
+  function loop(ts){
+    if(!state){return;}
+    expireBonusIfNeeded();
+    if(!state.paused && !state.over && !state.recovering && !(settings.controlMode==='mouse' && mouseControlAvailable && document.pointerLockElement!==canvas) && ts-lastStep>=state.stepMs){ step(); lastStep=ts; }
+    draw(); rafId=requestAnimationFrame(loop);
+  }
+  function step(){
+    state.dir={...state.nextDir};
+    const head={x:state.snake[0].x+state.dir.x,y:state.snake[0].y+state.dir.y};
+    const hitWall=head.x<0||head.y<0||head.x>=GRID||head.y>=GRID;
+    const hitSelf=state.snake.some((s,i)=>i>0&&s.x===head.x&&s.y===head.y);
+    if(hitWall||hitSelf){ loseLife(hitWall?'wall':'self'); return; }
+    state.snake.unshift(head);
+    const ateFood = sameCell(head,state.food);
+    const ateBonus = !!state.bonus && sameCell(head,state.bonus);
+    if(ateFood){
+      state.score+=10;
+      state.foodsEaten=(state.foodsEaten||0)+1;
+      recalcDifficulty();
+      state.food=randomFood(state.snake,state.bonus?[state.bonus]:[]);
+      maybeSpawnBonus();
+      beep(760+Math.min(state.level,12)*18,.055,.035,'sine');
+    }
+    if(ateBonus){
+      collectBonus();
+    }
+    if(!ateFood && !ateBonus) state.snake.pop();
+    updateHUD();
+  }
+  function resetSnakePosition(){
+    const c=Math.floor(GRID/2);
+    state.snake=[{x:c,y:c},{x:c-1,y:c},{x:c-2,y:c},{x:c-3,y:c}];
+    state.dir={x:1,y:0}; state.nextDir={x:1,y:0};
+    state.bonus=null;
+    state.food=randomFood(state.snake);
+  }
+  function loseLife(reason){
+    if(!state||state.over||state.recovering)return;
+    state.lives=Math.max(0,(state.lives??START_LIVES)-1);
+    updateHUD();
+    beep(210,.12,.05,'sawtooth'); setTimeout(()=>beep(150,.16,.04,'sawtooth'),80);
+    if(state.lives<=0){ gameOver(); return; }
+    state.recovering=true;
+    const currentState=state;
+    $('#overlayTitle').textContent=t('lifeLost');
+    $('#overlayText').textContent=`${t(reason==='wall'?'wallHit':'selfHit')} ${t('livesRemaining',{lives:state.lives})}`;
+    $('#playAgainOverlay').style.display='none';
+    $('#menuOverlay').style.display='none';
+    $('#gameOverlay').classList.add('show');
+    setTimeout(()=>{
+      if(state!==currentState || !state || state.over)return;
+      resetSnakePosition();
+      state.recovering=false;
+      $('#menuOverlay').style.display='';
+      hideOverlay(); updateHUD(); lastStep=performance.now();
+    },1100);
+  }
+  function gameOver(){
+    if(document.pointerLockElement===canvas) document.exitPointerLock?.();
+    state.over=true; state.recovering=false; $('#menuOverlay').style.display=''; beep(180,.16,.05,'sawtooth'); setTimeout(()=>beep(120,.20,.045,'sawtooth'),90);
+    addScore(state.player,state.score); localStorage.removeItem(STORAGE.save); refreshContinue(); updateHUD();
+    $('#overlayTitle').textContent=t('gameOver'); $('#overlayText').textContent=t('finalScore',{score:state.score}); $('#gameOverlay').classList.add('show');
+  }
+  function updateHUD(){ if(!state){ updateBonusBar(); return; } $('#hudPlayer').textContent=state.player;$('#hudScore').textContent=state.score;$('#hudBest').textContent=Math.max(bestScore(),state.score);$('#hudLevel').textContent=state.level;$('#hudLives').textContent='❤️'.repeat(Math.max(0,state.lives??START_LIVES)) || '0'; updateBonusBar(); }
+  function draw(){
+    const dpr=Math.min(window.devicePixelRatio||1,2); const rect=canvas.getBoundingClientRect(); const size=Math.max(280,Math.floor(Math.min(rect.width,rect.height)*dpr));
+    if(canvas.width!==size||canvas.height!==size){canvas.width=size;canvas.height=size;}
+    const W=canvas.width,H=canvas.height,cell=W/GRID;
+    const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#d6efff');bg.addColorStop(1,'#9fcbea');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(4,18,32,.24)';ctx.lineWidth=Math.max(1,dpr*.7);
+    for(let i=1;i<GRID;i++){let p=i*cell;ctx.beginPath();ctx.moveTo(p,0);ctx.lineTo(p,H);ctx.stroke();ctx.beginPath();ctx.moveTo(0,p);ctx.lineTo(W,p);ctx.stroke();}
+    if(!state)return;
+    // food glow
+    const fx=(state.food.x+.5)*cell, fy=(state.food.y+.5)*cell;
+    const glow=ctx.createRadialGradient(fx,fy,0,fx,fy,cell*1.5);glow.addColorStop(0,'rgba(255,215,106,.55)');glow.addColorStop(1,'rgba(255,215,106,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(fx,fy,cell*1.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ffd76a';ctx.beginPath();ctx.arc(fx,fy,cell*.28,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.arc(fx-cell*.08,fy-cell*.09,cell*.08,0,Math.PI*2);ctx.fill();
+    if(state.bonus){
+      const bx=(state.bonus.x+.5)*cell, by=(state.bonus.y+.5)*cell;
+      const life=state.bonus.type==='life';
+      const glow2=ctx.createRadialGradient(bx,by,0,bx,by,cell*1.45);
+      glow2.addColorStop(0,life?'rgba(255,96,125,.48)':'rgba(77,201,255,.48)');
+      glow2.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=glow2; ctx.beginPath(); ctx.arc(bx,by,cell*1.45,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=life?'#ff607d':'#4dc9ff'; ctx.beginPath(); ctx.arc(bx,by,cell*.30,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.96)'; ctx.font=`${Math.max(12,cell*.48)}px system-ui`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(life?'❤':'★',bx,by+cell*.02);
+      const frac=Math.max(0,Math.min(1,bonusRemainingMs()/state.bonus.durationMs));
+      ctx.strokeStyle='rgba(255,255,255,.68)'; ctx.lineWidth=Math.max(2,cell*.06); ctx.beginPath(); ctx.arc(bx,by,cell*.46,-Math.PI/2,-Math.PI/2+Math.PI*2*frac); ctx.stroke();
+    }
+    state.snake.forEach((s,i)=>{
+      const x=s.x*cell,y=s.y*cell,pad=cell*.10,r=cell*.27;
+      const grad=ctx.createLinearGradient(x,y,x+cell,y+cell);grad.addColorStop(0,i===0?'#7dffc0':'#63f5a4');grad.addColorStop(1,i===0?'#4dd9ff':'#2acb83');ctx.fillStyle=grad;
+      roundRect(ctx,x+pad,y+pad,cell-pad*2,cell-pad*2,r);ctx.fill();
+      if(i===0){
+        ctx.fillStyle='#07101d';const ex=x+cell*.66, ey1=y+cell*.34, ey2=y+cell*.66;
+        const vertical=Math.abs(state.dir.y)>0;
+        if(vertical){const yy=state.dir.y<0?y+cell*.30:y+cell*.70; ctx.beginPath();ctx.arc(x+cell*.36,yy,cell*.055,0,Math.PI*2);ctx.arc(x+cell*.64,yy,cell*.055,0,Math.PI*2);ctx.fill();}
+        else{const xx=state.dir.x<0?x+cell*.30:ex;ctx.beginPath();ctx.arc(xx,ey1,cell*.055,0,Math.PI*2);ctx.arc(xx,ey2,cell*.055,0,Math.PI*2);ctx.fill();}
+        if(mouseEnabled() && document.pointerLockElement===canvas){
+          const cx=x+cell*.5, cy=y+cell*.5;
+          ctx.save();
+          ctx.shadowColor='rgba(255,255,255,.98)';ctx.shadowBlur=cell*.45;
+          ctx.strokeStyle='rgba(255,255,255,.98)';ctx.lineWidth=Math.max(2,cell*.075);
+          ctx.beginPath();ctx.arc(cx,cy,cell*.48,0,Math.PI*2);ctx.stroke();
+          ctx.shadowBlur=0;
+          ctx.strokeStyle='rgba(5,28,45,.92)';ctx.lineWidth=Math.max(1.5,cell*.035);
+          ctx.beginPath();ctx.arc(cx,cy,cell*.54,0,Math.PI*2);ctx.stroke();
+          const dx=state.dir.x,dy=state.dir.y;
+          const tipX=cx+dx*cell*.74,tipY=cy+dy*cell*.74;
+          const baseX=cx+dx*cell*.48,baseY=cy+dy*cell*.48;
+          const px=-dy,py=dx;
+          ctx.fillStyle='rgba(255,255,255,.98)';ctx.strokeStyle='rgba(5,28,45,.92)';ctx.lineWidth=Math.max(1,cell*.025);
+          ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(baseX+px*cell*.17,baseY+py*cell*.17);ctx.lineTo(baseX-px*cell*.17,baseY-py*cell*.17);ctx.closePath();ctx.fill();ctx.stroke();
+          ctx.restore();
+        }
+      }
+    });
+  }
+  function roundRect(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+  function setDirection(x,y){
+    if(!state||state.paused||state.over||state.recovering)return;
+    if(x===-state.dir.x&&y===-state.dir.y)return;
+    state.nextDir={x,y};
+  }
+  function togglePause(){
+    if(!state||state.over||state.recovering)return;
+    state.paused=!state.paused;
+    if(state.paused) state.pauseStartedAt=Date.now();
+    else if(state.pauseStartedAt && state.bonus){ state.bonus.expiresAt += Date.now()-state.pauseStartedAt; state.pauseStartedAt=0; }
+    else state.pauseStartedAt=0;
+    $('#pauseBtn').textContent=state.paused?t('resume'):t('pause');
+    if(state.paused){ $('#overlayTitle').textContent=t('paused');$('#overlayText').textContent=t('pausedText');$('#playAgainOverlay').style.display='none';$('#menuOverlay').textContent=t('continue');$('#gameOverlay').classList.add('show'); }
+    else hideOverlay();
+    updateBonusBar();
+  }
+  function hideOverlay(){ $('#gameOverlay').classList.remove('show');$('#playAgainOverlay').style.display='';$('#menuOverlay').style.display='';$('#menuOverlay').textContent=t('backToMenu'); }
+  function saveAndExit(){
+    if(!state||state.over)return;
+    const save={player:state.player,snake:state.snake,dir:state.dir,nextDir:state.nextDir,food:state.food,bonus:state.bonus?{x:state.bonus.x,y:state.bonus.y,type:state.bonus.type,durationMs:state.bonus.durationMs,remainingMs:bonusRemainingMs()}:null,foodsEaten:state.foodsEaten||0,score:state.score,level:state.level,lives:state.lives,stepMs:state.stepMs};saveJSON(STORAGE.save,save);refreshContinue();beep(500,.05,.035);showMenu();showToast(t('saved'));
+  }
+  function exitWithoutSave(){
+    if(!state){showMenu();return;} if(!confirm(t('exitConfirm')))return; showMenu();
+  }
+  function showMenu(){ cancelAnimationFrame(rafId); if(document.pointerLockElement===canvas) document.exitPointerLock?.(); state=null; hideOverlay(); showScreen('menu'); refreshContinue(); renderLeaderboard(); updateBonusBar(); updateMouseStatus(); }
+  function replay(){ const name=state?.player||settings.playerName||$('#playerName').value.trim(); if(!name){showMenu();return;} state=initialState(name);state.food=randomFood(state.snake);hideOverlay();updateHUD();updateMouseStatus();resetLoop();beep(540,.05,.035,'triangle'); }
+
+  $('#languageSelect').addEventListener('change',e=>setLanguage(e.target.value));
+  $('#playerName').addEventListener('input',e=>{settings.playerName=e.target.value.slice(0,18);saveJSON(STORAGE.settings,settings);});
+  $('#playerName').addEventListener('keydown',e=>{if(e.key==='Enter')startNew();});
+  $('#newGameBtn').addEventListener('click',startNew); $('#continueBtn').addEventListener('click',continueSaved);
+  $('#soundTop').addEventListener('click',toggleSound); $('#soundSwitch').addEventListener('click',toggleSound);
+  $('#controlModeSelect').addEventListener('change',e=>setControlMode(e.target.value));
+  $('#fullscreenTop').addEventListener('click',toggleFullscreen); $('#fullscreenSwitch').addEventListener('click',toggleFullscreenPref);
+  $('#pauseBtn').addEventListener('click',togglePause); $('#saveExitBtn').addEventListener('click',saveAndExit); $('#exitNoSaveBtn').addEventListener('click',exitWithoutSave);
+  $('#playAgainOverlay').addEventListener('click',replay); $('#menuOverlay').addEventListener('click',()=>{ if(state?.paused){togglePause();} else showMenu(); });
+  $('#infoTop').addEventListener('click',()=>$('#infoModal').classList.add('show')); $('#closeInfo').addEventListener('click',()=>$('#infoModal').classList.remove('show')); $('#infoModal').addEventListener('click',e=>{if(e.target.id==='infoModal')e.currentTarget.classList.remove('show');});
+  $$('.dir-btn').forEach(b=>b.addEventListener('pointerdown',()=>{const d=b.dataset.dir; if(d==='up')setDirection(0,-1);if(d==='down')setDirection(0,1);if(d==='left')setDirection(-1,0);if(d==='right')setDirection(1,0);}));
+  window.addEventListener('keydown',e=>{
+    if(!state||!$('#gameScreen').classList.contains('active'))return;
+    const key=e.key.toLowerCase();
+    if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d',' '].includes(key))e.preventDefault();
+    if(key===' ')togglePause();
+    else if(!keyboardEnabled())return;
+    else if(key==='arrowup'||key==='w')setDirection(0,-1);
+    else if(key==='arrowdown'||key==='s')setDirection(0,1);
+    else if(key==='arrowleft'||key==='a')setDirection(-1,0);
+    else if(key==='arrowright'||key==='d')setDirection(1,0);
+  },{passive:false});
+  canvas.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'){ activateMouseControl(); return; }
+    if(e.pointerType!=='touch')return;
+    touchStart={x:e.clientX,y:e.clientY,pointerType:e.pointerType};
+  });
+  canvas.addEventListener('pointerup',e=>{
+    if(!touchStart)return;
+    const start=touchStart; touchStart=null;
+    if(start.pointerType!=='touch')return;
+    const dx=e.clientX-start.x,dy=e.clientY-start.y;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<22)return;
+    if(Math.abs(dx)>Math.abs(dy))setDirection(dx>0?1:-1,0);else setDirection(0,dy>0?1:-1);
+  });
+  canvas.addEventListener('pointercancel',()=>{touchStart=null;});
+  document.addEventListener('pointerlockchange',()=>{
+    const locked=document.pointerLockElement===canvas;
+    if(settings.controlMode==='mouse' && state && !state.over){
+      if(!locked && !mouseLockPauseStartedAt) mouseLockPauseStartedAt=Date.now();
+      else if(locked && mouseLockPauseStartedAt){
+        if(state.bonus) state.bonus.expiresAt += Date.now()-mouseLockPauseStartedAt;
+        mouseLockPauseStartedAt=0;
+      }
+    }else mouseLockPauseStartedAt=0;
+    mouseAccumX=mouseAccumY=0; lastMouseTurnAt=0; updateMouseStatus(); lastStep=performance.now();
+  });
+  document.addEventListener('pointerlockerror',()=>{showToast(t('pointerLockFailed'));updateMouseStatus();});
+  document.addEventListener('mousemove',e=>{
+    if(!state || !mouseEnabled() || document.pointerLockElement!==canvas || state.paused || state.over || state.recovering)return;
+    mouseAccumX+=e.movementX||0; mouseAccumY+=e.movementY||0;
+    const now=performance.now();
+    if(now-lastMouseTurnAt<MOUSE_TURN_COOLDOWN)return;
+    if(Math.max(Math.abs(mouseAccumX),Math.abs(mouseAccumY))<MOUSE_TURN_THRESHOLD)return;
+    if(Math.abs(mouseAccumX)>=Math.abs(mouseAccumY)) setDirection(mouseAccumX>0?1:-1,0);
+    else setDirection(0,mouseAccumY>0?1:-1);
+    mouseAccumX=mouseAccumY=0; lastMouseTurnAt=now;
+  });
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&state&&!state.over&&!state.paused){togglePause();}});
+  window.addEventListener('resize',draw);
+
+  settings.lang=translations[settings.lang]?settings.lang:'en'; if(!mouseControlAvailable && settings.controlMode!=='keyboard') settings.controlMode='keyboard'; saveJSON(STORAGE.settings,settings); syncSettingsUI();applyTranslations();refreshContinue();renderLeaderboard();draw();
+})();
+</script>
+</body>
+</html>
