@@ -1,0 +1,77 @@
+name: One-time SEO metadata update
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/seo-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Modern Snake metadata
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path("index.html")
+          text = path.read_bytes().decode("utf-8")
+          url = "https://modernsnake.appsandgames.org/"
+
+          text = re.sub(r'<title>.*?</title>', '<title>Modern Snake — Free Online Snake Game | Apps & Games</title>', text, count=1, flags=re.S)
+
+          if f'rel="canonical" href="{url}"' not in text:
+              seo = '''<meta name="description" content="Play Modern Snake free online with three lives, timed bonus food, keyboard, mouse and touch controls, saved progress and a local leaderboard.">
+          <meta name="robots" content="index, follow">
+          <link rel="canonical" href="https://modernsnake.appsandgames.org/">
+          <meta property="og:type" content="website">
+          <meta property="og:title" content="Modern Snake — Free Online Snake Game">
+          <meta property="og:description" content="Play a modern Snake game with bonus food, three lives, saved progress and keyboard, mouse or touch controls.">
+          <meta property="og:url" content="https://modernsnake.appsandgames.org/">
+          <meta property="og:site_name" content="Apps & Games">
+          <meta property="og:image" content="https://appsandgames.org/assets/logo/apps-and-games-logo.png">
+          <meta property="og:image:alt" content="Modern Snake on Apps & Games">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Modern Snake | Apps & Games">
+          <meta name="twitter:description" content="A free modern Snake game with bonuses, saved progress and multiple control methods.">
+          <meta name="twitter:image" content="https://appsandgames.org/assets/logo/apps-and-games-logo.png">
+          <script type="application/ld+json">
+          {
+            "@context":"https://schema.org",
+            "@type":["VideoGame","SoftwareApplication"],
+            "name":"Modern Snake",
+            "url":"https://modernsnake.appsandgames.org/",
+            "description":"A free modern Snake browser game with three lives, timed bonus food, saved progress, local leaderboard and multiple control methods.",
+            "applicationCategory":"GameApplication",
+            "gamePlatform":["Web browser","Desktop","Mobile"],
+            "operatingSystem":"Any",
+            "isAccessibleForFree":true,
+            "inLanguage":["en","hr","de","it","es"],
+            "publisher":{"@type":"Organization","name":"Apps & Games","url":"https://appsandgames.org/"},
+            "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+          }
+          </script>
+          '''
+              marker = '<style>'
+              if marker not in text:
+                  raise SystemExit("Style marker not found; no SEO block inserted.")
+              text = text.replace(marker, seo + marker, 1)
+
+          path.write_bytes(text.encode("utf-8"))
+          workflow = Path(".github/workflows/seo-once.yml")
+          if workflow.exists():
+              workflow.unlink()
+      - name: Commit SEO update and remove helper workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "SEO: add Modern Snake metadata"
+          git push
