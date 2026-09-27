@@ -50,6 +50,7 @@
   body{min-height:100vh;min-height:100dvh}
   button,input,select{font:inherit}
   button{border:0;cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--accent2);outline-offset:3px}
   .app{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px clamp(14px,3vw,28px);position:relative;z-index:5}
   .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.4px}
@@ -226,10 +227,10 @@
               </div>
             </div>
             <div class="mobile-controls" aria-label="Mobile controls">
-              <button class="dir-btn" data-dir="up" type="button">▲</button>
-              <button class="dir-btn" data-dir="left" type="button">◀</button>
-              <button class="dir-btn" data-dir="down" type="button">▼</button>
-              <button class="dir-btn" data-dir="right" type="button">▶</button>
+              <button class="dir-btn" data-dir="up" type="button" aria-label="Up" data-i18n-aria="directionUp">▲</button>
+              <button class="dir-btn" data-dir="left" type="button" aria-label="Left" data-i18n-aria="directionLeft">◀</button>
+              <button class="dir-btn" data-dir="down" type="button" aria-label="Down" data-i18n-aria="directionDown">▼</button>
+              <button class="dir-btn" data-dir="right" type="button" aria-label="Right" data-i18n-aria="directionRight">▶</button>
             </div>
           </div>
           <aside class="card game-side">
@@ -252,7 +253,7 @@
 
 <div id="infoModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
   <div class="modal-card">
-    <div class="modal-head"><h2 id="infoTitle">Information / Donations</h2><button id="closeInfo" class="close" type="button">×</button></div>
+    <div class="modal-head"><h2 id="infoTitle">Information / Donations</h2><button id="closeInfo" class="close" type="button" aria-label="Close information" data-i18n-aria="closeInformation">×</button></div>
     <div id="infoContent" class="info-text"></div>
   </div>
 </div>
@@ -291,7 +292,15 @@
     it:{lives:'Vite',goalLabel:'Obiettivo:',goalBrief:'Mangia il cibo dorato, fai crescere il serpente e ottieni più punti possibile.',livesLabel:'Vite:',livesBrief:'Inizi con 3 vite. Colpire un muro o il proprio corpo costa una vita.',bonusLabel:'Bonus:',bonusBrief:'Il cibo bonus temporaneo appare per pochi secondi. Il cuore dà una vita extra, la stella dà +50 punti.',lifeLost:'Vita persa!',livesRemaining:'Vite rimaste: {lives}',wallHit:'Hai colpito il muro.',selfHit:'Hai colpito il tuo corpo.',infoTitle:'Informazioni / Donazioni',howToPlayTitle:'Obiettivo del gioco',howToPlayInfo:'Mangia il cibo dorato per far crescere il serpente e ottenere più punti possibile. Il gioco diventa gradualmente più veloce con l’aumentare del livello.',lifeRulesTitle:'Vite e collisioni',lifeRulesInfo:'Ogni nuova partita inizia con 3 vite. Colpire un muro o il proprio corpo costa una vita. Dopo aver perso una vita, il serpente riparte dal centro mentre punteggio e livello vengono mantenuti. La partita termina quando perdi tutte e 3 le vite.',bonusTitle:'Cibo bonus',bonusInfo:'Il cibo bonus temporaneo può apparire dopo diversi cibi normali e rimane visibile solo per pochi secondi. Un cuore concede +1 vita. Se hai già tutte le vite, il cuore assegna invece +100 punti. Una stella concede +50 punti. Anche il cibo bonus conta come cibo, quindi il serpente cresce quando lo raccogli.',controlInfoTitle:'Metodi di controllo',controlInfo:'Su computer o laptop controlla il serpente con i tasti freccia o WASD. Premi Spazio per mettere in pausa o riprendere. Su smartphone e tablet scorri direttamente sul campo di gioco oppure usa i pulsanti direzionali sullo schermo.',donationsTitle:'Donazioni',donationLine1:'L’applicazione è gratuita, ma le donazioni sono benvenute.',donationLine2:'Una parte delle donazioni ricevute sarà destinata a varie organizzazioni benefiche; la parte maggiore sarà donata a istituzioni che si occupano di bambini privi di adeguate cure genitoriali.',donateTo:'Puoi effettuare donazioni a:',cardPayment:'Pagamento con carta (Stripe)',cryptoWallet:'Portafoglio crypto',bonusBarLabel:'Bonus:',bonusTimeLeft:'scompare tra {time}s',bonusLifeName:'Vita extra',bonusScoreName:'Punti +50',bonusAppeared:'È apparso un cibo bonus!',bonusLifeToast:'+1 vita',bonusLifeFullToast:'Vite piene: +100 punti',bonusScoreToast:'+50 punti bonus'},
     es:{lives:'Vidas',goalLabel:'Objetivo:',goalBrief:'Come la comida dorada, haz crecer la serpiente y consigue tantos puntos como puedas.',livesLabel:'Vidas:',livesBrief:'Empiezas con 3 vidas. Chocar contra una pared o tu propio cuerpo cuesta una vida.',bonusLabel:'Bonus:',bonusBrief:'La comida bonus temporal aparece durante unos segundos. El corazón da una vida extra y la estrella aporta +50 puntos.',lifeLost:'¡Vida perdida!',livesRemaining:'Vidas restantes: {lives}',wallHit:'Has chocado contra la pared.',selfHit:'Has chocado contra tu propio cuerpo.',infoTitle:'Información / Donaciones',howToPlayTitle:'Objetivo del juego',howToPlayInfo:'Come la comida dorada para hacer crecer la serpiente y conseguir tantos puntos como sea posible. El juego se vuelve gradualmente más rápido a medida que subes de nivel.',lifeRulesTitle:'Vidas y colisiones',lifeRulesInfo:'Cada nueva partida comienza con 3 vidas. Chocar contra una pared o tu propio cuerpo cuesta una vida. Después de perder una vida, la serpiente vuelve a empezar desde el centro y se conservan la puntuación y el nivel. La partida termina cuando pierdes las 3 vidas.',bonusTitle:'Comida bonus',bonusInfo:'La comida bonus temporal puede aparecer después de varias comidas normales y solo permanece visible durante unos segundos. Un corazón otorga +1 vida. Si ya tienes todas las vidas, ese corazón da +100 puntos en su lugar. Una estrella otorga +50 puntos. La comida bonus también cuenta como comida, así que la serpiente crece cuando la recoges.',controlInfoTitle:'Métodos de control',controlInfo:'En un ordenador o portátil, controla la serpiente con las flechas o WASD. Pulsa Espacio para pausar o continuar. En teléfonos y tabletas, desliza el dedo directamente sobre el tablero o usa los botones de dirección en pantalla.',donationsTitle:'Donaciones',donationLine1:'La aplicación es gratuita, pero las donaciones son bienvenidas.',donationLine2:'Una parte de las donaciones recibidas se destinará a diversas organizaciones benéficas; la mayor parte se donará a instituciones que atienden a niños sin una atención parental adecuada.',donateTo:'Puedes realizar donaciones a:',cardPayment:'Pago con tarjeta (Stripe)',cryptoWallet:'Monedero cripto',bonusBarLabel:'Bonus:',bonusTimeLeft:'desaparece en {time}s',bonusLifeName:'Vida extra',bonusScoreName:'Puntos +50',bonusAppeared:'¡Ha aparecido comida bonus!',bonusLifeToast:'+1 vida',bonusLifeFullToast:'Vidas completas: +100 puntos',bonusScoreToast:'+50 puntos bonus'}
   };
+  const accessibilityTranslations = {
+    en:{directionUp:'Up',directionLeft:'Left',directionDown:'Down',directionRight:'Right',closeInformation:'Close information'},
+    hr:{directionUp:'Gore',directionLeft:'Lijevo',directionDown:'Dolje',directionRight:'Desno',closeInformation:'Zatvori informacije'},
+    de:{directionUp:'Oben',directionLeft:'Links',directionDown:'Unten',directionRight:'Rechts',closeInformation:'Informationen schließen'},
+    it:{directionUp:'Su',directionLeft:'Sinistra',directionDown:'Giù',directionRight:'Destra',closeInformation:'Chiudi informazioni'},
+    es:{directionUp:'Arriba',directionLeft:'Izquierda',directionDown:'Abajo',directionRight:'Derecha',closeInformation:'Cerrar información'}
+  };
   Object.keys(extraTranslations).forEach(lang => Object.assign(translations[lang], extraTranslations[lang]));
+  Object.keys(accessibilityTranslations).forEach(lang => Object.assign(translations[lang], accessibilityTranslations[lang]));
 
   const controlTranslations = {
     en:{tip:'Choose Keyboard, Mouse, or both on computers. Mouse control needs one click on the game board to activate. On mobile, swipe or use the on-screen controls.',controlMode:'Control',controlKeyboard:'Keyboard',controlMouse:'Mouse',controlBoth:'Keyboard + Mouse',controlInfoTitle:'Control methods',controlInfo:'On a computer or laptop you can choose Keyboard, Mouse, or Keyboard + Mouse in the main menu. Keyboard uses Arrow keys or WASD. For Mouse control, start or continue a game and click the game board once. The browser then activates Pointer Lock: the cursor disappears and moving the mouse up, down, left or right steers the snake in that direction without further clicking. Press Esc to release the mouse. In Mouse mode the snake waits while Pointer Lock is inactive; in Keyboard + Mouse mode the keyboard remains usable. Space pauses or resumes. On phones and tablets, swipe on the game board or use the on-screen direction buttons.',mouseStatusInactive:'Mouse control ready — click the game board once to activate it.',mouseStatusActive:'Mouse control active — move the mouse to steer. Press Esc to release it.',mouseStatusKeyboard:'Keyboard control active — use Arrow keys or WASD.',mouseStatusBothInactive:'Keyboard + Mouse — keyboard works now; click the game board once to activate mouse control.',pointerLockFailed:'Mouse control could not be activated. Click the game board again or use Keyboard mode.'},
@@ -337,6 +346,7 @@
     document.documentElement.lang=settings.lang;
     $$('[data-i18n]').forEach(el=>{ const key=el.dataset.i18n; el.textContent=t(key); });
     $$('[data-i18n-placeholder]').forEach(el=>{ el.placeholder=t(el.dataset.i18nPlaceholder); });
+    $$('[data-i18n-aria]').forEach(el=>{ el.setAttribute('aria-label',t(el.dataset.i18nAria)); });
     if(state?.paused) $('#pauseBtn').textContent=t('resume'); else $('#pauseBtn').textContent=t('pause');
     renderLeaderboard();
     renderInfo();
@@ -713,7 +723,13 @@
   $('#fullscreenTop').addEventListener('click',toggleFullscreen); $('#fullscreenSwitch').addEventListener('click',toggleFullscreenPref);
   $('#pauseBtn').addEventListener('click',togglePause); $('#saveExitBtn').addEventListener('click',saveAndExit); $('#exitNoSaveBtn').addEventListener('click',exitWithoutSave);
   $('#playAgainOverlay').addEventListener('click',replay); $('#menuOverlay').addEventListener('click',()=>{ if(state?.paused){togglePause();} else showMenu(); });
-  $('#infoTop').addEventListener('click',()=>$('#infoModal').classList.add('show')); $('#closeInfo').addEventListener('click',()=>$('#infoModal').classList.remove('show')); $('#infoModal').addEventListener('click',e=>{if(e.target.id==='infoModal')e.currentTarget.classList.remove('show');});
+  let infoReturnFocus=null;
+  function openInfo(){ infoReturnFocus=document.activeElement; $('#infoModal').classList.add('show'); $('#closeInfo').focus(); }
+  function closeInfo(){ $('#infoModal').classList.remove('show'); if(infoReturnFocus?.focus) infoReturnFocus.focus(); infoReturnFocus=null; }
+  $('#infoTop').addEventListener('click',openInfo);
+  $('#closeInfo').addEventListener('click',closeInfo);
+  $('#infoModal').addEventListener('click',e=>{if(e.target.id==='infoModal')closeInfo();});
+  $('#infoModal').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeInfo();}});
   $$('.dir-btn').forEach(b=>b.addEventListener('pointerdown',()=>{const d=b.dataset.dir; if(d==='up')setDirection(0,-1);if(d==='down')setDirection(0,1);if(d==='left')setDirection(-1,0);if(d==='right')setDirection(1,0);}));
   window.addEventListener('keydown',e=>{
     if(!state||!$('#gameScreen').classList.contains('active'))return;
