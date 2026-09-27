@@ -4,8 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0b1020" />
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/modern-snake-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/modern-snake-180.png">
 <title>Modern Snake — Free Online Snake Game | Apps & Games</title>
 <meta name="description" content="Play Modern Snake free online with three lives, timed bonus food, keyboard, mouse and touch controls, saved progress and a local leaderboard.">
+<meta name="keywords" content="Modern Snake, Snake game, free online game, browser game, touch game, Apps & Games">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://modernsnake.appsandgames.org/">
 <meta property="og:type" content="website">
@@ -26,6 +30,7 @@
   "name":"Modern Snake",
   "url":"https://modernsnake.appsandgames.org/",
   "description":"A free modern Snake browser game with three lives, timed bonus food, saved progress, local leaderboard and multiple control methods.",
+  "image":"https://appsandgames.org/assets/social/modern-snake.jpg",
   "applicationCategory":"GameApplication",
   "gamePlatform":["Web browser","Desktop","Mobile"],
   "operatingSystem":"Any",
@@ -135,6 +140,14 @@
   /* Apps & Games standard Info / Donations */
   #infoModal .modal-card{width:min(800px,100%);max-height:90dvh;overflow:auto}
   .snake-info-section{margin-top:18px}
+  .snake-about{padding:16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035)}
+  .snake-about h3:first-child{margin-top:0}
+  .snake-about-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+  .snake-about-meta{padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.035)}
+  .snake-about-meta strong{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+  .snake-about-meta span{font-weight:850}
+  .snake-privacy{padding:10px 11px;border-radius:12px;background:rgba(77,201,255,.06);border:1px solid rgba(77,201,255,.18)}
+  .snake-portal-link{display:inline-flex;margin-top:4px;color:var(--accent2);font-weight:850;text-decoration:none}
   .snake-charity{padding:15px 16px;border:1px solid rgba(99,245,164,.24);border-radius:16px;background:rgba(99,245,164,.055)}
   .snake-charity strong{display:block;color:var(--accent);font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px}
   .snake-charity p{margin:7px 0;color:#dbe7f7}
@@ -146,7 +159,7 @@
   .snake-payment-action{display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:12px;text-decoration:none;font-weight:900;color:#052013;background:linear-gradient(90deg,var(--accent),var(--accent2));text-align:center;padding:9px 12px}.snake-payment-card.stripe .snake-payment-action{background:linear-gradient(90deg,#ffd76a,#ffb15f)}
   .snake-payment-note{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.45}
   .snake-crypto-list{display:flex;flex-direction:column;gap:8px}.snake-crypto-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.03)}.snake-crypto-code{color:var(--accent2);font-weight:900;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.snake-crypto-address{min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#b9ffd8;overflow-wrap:anywhere;user-select:text}.snake-copy-btn{min-width:78px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--text);font-size:11px;font-weight:850}.snake-copy-btn.copied{color:var(--accent);border-color:rgba(99,245,164,.45);background:rgba(99,245,164,.09)}
-  @media(max-width:640px){.snake-payment-grid{grid-template-columns:1fr}.snake-crypto-row{grid-template-columns:52px minmax(0,1fr)}.snake-copy-btn{grid-column:2;justify-self:end}}
+  @media(max-width:640px){.snake-about-grid{grid-template-columns:1fr}.snake-payment-grid{grid-template-columns:1fr}.snake-crypto-row{grid-template-columns:52px minmax(0,1fr)}.snake-copy-btn{grid-column:2;justify-self:end}}
 
 </style>
 
@@ -299,8 +312,16 @@
     it:{directionUp:'Su',directionLeft:'Sinistra',directionDown:'Giù',directionRight:'Destra',closeInformation:'Chiudi informazioni'},
     es:{directionUp:'Arriba',directionLeft:'Izquierda',directionDown:'Abajo',directionRight:'Derecha',closeInformation:'Cerrar información'}
   };
+  const infoStandardTranslations = {
+    en:{infoAppSummary:'A modern browser edition of the classic Snake game with three lives, timed bonus food and several control methods.',infoFeaturesTitle:'Main features',infoFeaturesText:'Three lives, progressive speed, timed heart and star bonuses, save and continue, local Top 10, sound, fullscreen, keyboard, mouse and touch controls.',infoVersionLabel:'Version',infoVersionValue:'Web',infoPublisherLabel:'Publisher',infoPriceLabel:'Price',infoFreeValue:'Free',infoPrivacyLabel:'Privacy',infoPrivacyText:'Settings, saved game and leaderboard data are stored locally in this browser with localStorage. No Apps & Games account is required.',infoPortalLink:'Open Apps & Games'},
+    hr:{infoAppSummary:'Moderna preglednička verzija klasične igre Snake s tri života, vremenski ograničenom bonus hranom i više načina upravljanja.',infoFeaturesTitle:'Glavne funkcije',infoFeaturesText:'Tri života, postupno ubrzavanje, vremenski ograničeni bonusi srca i zvjezdice, spremanje i nastavak igre, lokalni Top 10, zvuk, puni zaslon te upravljanje tipkovnicom, mišem i dodirom.',infoVersionLabel:'Verzija',infoVersionValue:'Web',infoPublisherLabel:'Izdavač',infoPriceLabel:'Cijena',infoFreeValue:'Besplatno',infoPrivacyLabel:'Privatnost',infoPrivacyText:'Postavke, spremljena igra i rang-lista čuvaju se lokalno u ovom pregledniku putem localStoragea. Apps & Games račun nije potreban.',infoPortalLink:'Otvori Apps & Games'},
+    de:{infoAppSummary:'Eine moderne Browser-Version des klassischen Snake-Spiels mit drei Leben, zeitlich begrenztem Bonusfutter und mehreren Steuerungsmethoden.',infoFeaturesTitle:'Hauptfunktionen',infoFeaturesText:'Drei Leben, steigendes Tempo, zeitlich begrenzte Herz- und Sternboni, Speichern und Fortsetzen, lokale Top 10, Ton, Vollbild sowie Tastatur-, Maus- und Touch-Steuerung.',infoVersionLabel:'Version',infoVersionValue:'Web',infoPublisherLabel:'Herausgeber',infoPriceLabel:'Preis',infoFreeValue:'Kostenlos',infoPrivacyLabel:'Datenschutz',infoPrivacyText:'Einstellungen, Spielstand und Bestenliste werden mit localStorage lokal in diesem Browser gespeichert. Ein Apps-&-Games-Konto ist nicht erforderlich.',infoPortalLink:'Apps & Games öffnen'},
+    it:{infoAppSummary:'Una moderna versione browser del classico Snake con tre vite, cibo bonus temporaneo e diversi metodi di controllo.',infoFeaturesTitle:'Funzioni principali',infoFeaturesText:'Tre vite, velocità progressiva, bonus temporanei cuore e stella, salvataggio e ripresa, Top 10 locale, audio, schermo intero e controlli da tastiera, mouse e touch.',infoVersionLabel:'Versione',infoVersionValue:'Web',infoPublisherLabel:'Editore',infoPriceLabel:'Prezzo',infoFreeValue:'Gratis',infoPrivacyLabel:'Privacy',infoPrivacyText:'Impostazioni, partita salvata e classifica vengono memorizzate localmente in questo browser tramite localStorage. Non è richiesto un account Apps & Games.',infoPortalLink:'Apri Apps & Games'},
+    es:{infoAppSummary:'Una versión moderna para navegador del clásico Snake con tres vidas, comida bonus temporal y varios métodos de control.',infoFeaturesTitle:'Funciones principales',infoFeaturesText:'Tres vidas, velocidad progresiva, bonus temporales de corazón y estrella, guardar y continuar, Top 10 local, sonido, pantalla completa y controles de teclado, ratón y táctiles.',infoVersionLabel:'Versión',infoVersionValue:'Web',infoPublisherLabel:'Editor',infoPriceLabel:'Precio',infoFreeValue:'Gratis',infoPrivacyLabel:'Privacidad',infoPrivacyText:'Los ajustes, la partida guardada y la clasificación se almacenan localmente en este navegador mediante localStorage. No se necesita una cuenta de Apps & Games.',infoPortalLink:'Abrir Apps & Games'}
+  };
   Object.keys(extraTranslations).forEach(lang => Object.assign(translations[lang], extraTranslations[lang]));
   Object.keys(accessibilityTranslations).forEach(lang => Object.assign(translations[lang], accessibilityTranslations[lang]));
+  Object.keys(infoStandardTranslations).forEach(lang => Object.assign(translations[lang], infoStandardTranslations[lang]));
 
   const controlTranslations = {
     en:{tip:'Choose Keyboard, Mouse, or both on computers. Mouse control needs one click on the game board to activate. On mobile, swipe or use the on-screen controls.',controlMode:'Control',controlKeyboard:'Keyboard',controlMouse:'Mouse',controlBoth:'Keyboard + Mouse',controlInfoTitle:'Control methods',controlInfo:'On a computer or laptop you can choose Keyboard, Mouse, or Keyboard + Mouse in the main menu. Keyboard uses Arrow keys or WASD. For Mouse control, start or continue a game and click the game board once. The browser then activates Pointer Lock: the cursor disappears and moving the mouse up, down, left or right steers the snake in that direction without further clicking. Press Esc to release the mouse. In Mouse mode the snake waits while Pointer Lock is inactive; in Keyboard + Mouse mode the keyboard remains usable. Space pauses or resumes. On phones and tablets, swipe on the game board or use the on-screen direction buttons.',mouseStatusInactive:'Mouse control ready — click the game board once to activate it.',mouseStatusActive:'Mouse control active — move the mouse to steer. Press Esc to release it.',mouseStatusKeyboard:'Keyboard control active — use Arrow keys or WASD.',mouseStatusBothInactive:'Keyboard + Mouse — keyboard works now; click the game board once to activate mouse control.',pointerLockFailed:'Mouse control could not be activated. Click the game board again or use Keyboard mode.'},
@@ -340,7 +361,7 @@
   const mouseControlAvailable = typeof canvas.requestPointerLock === 'function' && window.matchMedia?.('(pointer:fine)').matches !== false;
 
   function loadJSON(key, fallback){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):fallback; }catch{ return fallback; } }
-  function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function saveJSON(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); return true; }catch{ return false; } }
   function t(key, vars={}){ let s=(translations[settings.lang]||translations.en)[key] ?? translations.en[key] ?? key; return s.replace(/\{(\w+)\}/g,(_,k)=>vars[k]??''); }
   function applyTranslations(){
     document.documentElement.lang=settings.lang;
@@ -462,6 +483,18 @@
     const walletHtml=wallets.map(([coin,address])=>`<div class="snake-crypto-row"><div class="snake-crypto-code">${coin}</div><div class="snake-crypto-address">${address}</div><button type="button" class="snake-copy-btn" data-address="${address}">${i.copy}</button></div>`).join('');
     content.innerHTML=`
       <div id="snake-standard-info">
+        <div class="snake-about">
+          <h3>🐍 Modern Snake</h3>
+          <p>${t('infoAppSummary')}</p>
+          <div class="snake-about-grid">
+            <div class="snake-about-meta"><strong>${t('infoVersionLabel')}</strong><span>${t('infoVersionValue')}</span></div>
+            <div class="snake-about-meta"><strong>${t('infoPublisherLabel')}</strong><span>Apps & Games</span></div>
+            <div class="snake-about-meta"><strong>${t('infoPriceLabel')}</strong><span>${t('infoFreeValue')}</span></div>
+          </div>
+          <h3>✨ ${t('infoFeaturesTitle')}</h3><p>${t('infoFeaturesText')}</p>
+          <p class="snake-privacy"><strong>${t('infoPrivacyLabel')}:</strong> ${t('infoPrivacyText')}</p>
+          <a class="snake-portal-link" href="https://appsandgames.org/" target="_blank" rel="noopener noreferrer">${t('infoPortalLink')} ↗</a>
+        </div>
         <h3>🎯 ${t('howToPlayTitle')}</h3><p>${t('howToPlayInfo')}</p>
         <h3>❤️ ${t('lifeRulesTitle')}</h3><p>${t('lifeRulesInfo')}</p>
         <h3>⭐ ${t('bonusTitle')}</h3><p>${t('bonusInfo')}</p>
@@ -793,5 +826,6 @@
 })();
 </script>
 <script src="./ag-language-menu.js"></script>
+<script src="./pwa.js"></script>
 </body>
 </html>
