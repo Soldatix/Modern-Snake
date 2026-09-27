@@ -1,5 +1,5 @@
 const CACHE_PREFIX='modern-snake-';
-const CACHE_NAME=CACHE_PREFIX+'2026-09-27-v1';
+const CACHE_NAME=CACHE_PREFIX+'2026-09-27-v2';
 const CORE=[
   './',
   './index.html',
@@ -27,6 +27,18 @@ self.addEventListener('activate',(event)=>{
   );
 });
 
+function networkFirst(request,fallback){
+  return fetch(request)
+    .then((response)=>{
+      if(response&&response.ok){
+        const copy=response.clone();
+        caches.open(CACHE_NAME).then((cache)=>cache.put(request,copy));
+      }
+      return response;
+    })
+    .catch(()=>caches.match(request).then((cached)=>cached||caches.match(fallback)));
+}
+
 self.addEventListener('fetch',(event)=>{
   const request=event.request;
   if(request.method!=='GET')return;
@@ -34,17 +46,12 @@ self.addEventListener('fetch',(event)=>{
   if(url.origin!==self.location.origin)return;
 
   if(request.mode==='navigate'){
-    event.respondWith(
-      fetch(request)
-        .then((response)=>{
-          if(response&&response.ok){
-            const copy=response.clone();
-            caches.open(CACHE_NAME).then((cache)=>cache.put('./index.html',copy));
-          }
-          return response;
-        })
-        .catch(()=>caches.match('./index.html'))
-    );
+    event.respondWith(networkFirst(request,'./index.html'));
+    return;
+  }
+
+  if(request.destination==='script'||request.destination==='manifest'){
+    event.respondWith(networkFirst(request,request));
     return;
   }
 

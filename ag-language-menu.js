@@ -158,6 +158,8 @@
     select.parentNode.insertBefore(wrap, select);
     wrap.appendChild(select);
     select.classList.add('ag-language-native');
+    select.tabIndex = -1;
+    select.setAttribute('aria-hidden', 'true');
 
     const trigger = document.createElement('button');
     trigger.type = 'button';

@@ -321,7 +321,15 @@
   };
   Object.keys(extraTranslations).forEach(lang => Object.assign(translations[lang], extraTranslations[lang]));
   Object.keys(accessibilityTranslations).forEach(lang => Object.assign(translations[lang], accessibilityTranslations[lang]));
+  const storageSafetyTranslations = {
+    en:{saveFailed:'Saving failed. Your game is still open.'},
+    hr:{saveFailed:'Spremanje nije uspjelo. Igra je i dalje otvorena.'},
+    de:{saveFailed:'Speichern fehlgeschlagen. Das Spiel bleibt geöffnet.'},
+    it:{saveFailed:'Salvataggio non riuscito. La partita resta aperta.'},
+    es:{saveFailed:'Error al guardar. La partida sigue abierta.'}
+  };
   Object.keys(infoStandardTranslations).forEach(lang => Object.assign(translations[lang], infoStandardTranslations[lang]));
+  Object.keys(storageSafetyTranslations).forEach(lang => Object.assign(translations[lang], storageSafetyTranslations[lang]));
 
   const controlTranslations = {
     en:{tip:'Choose Keyboard, Mouse, or both on computers. Mouse control needs one click on the game board to activate. On mobile, swipe or use the on-screen controls.',controlMode:'Control',controlKeyboard:'Keyboard',controlMouse:'Mouse',controlBoth:'Keyboard + Mouse',controlInfoTitle:'Control methods',controlInfo:'On a computer or laptop you can choose Keyboard, Mouse, or Keyboard + Mouse in the main menu. Keyboard uses Arrow keys or WASD. For Mouse control, start or continue a game and click the game board once. The browser then activates Pointer Lock: the cursor disappears and moving the mouse up, down, left or right steers the snake in that direction without further clicking. Press Esc to release the mouse. In Mouse mode the snake waits while Pointer Lock is inactive; in Keyboard + Mouse mode the keyboard remains usable. Space pauses or resumes. On phones and tablets, swipe on the game board or use the on-screen direction buttons.',mouseStatusInactive:'Mouse control ready — click the game board once to activate it.',mouseStatusActive:'Mouse control active — move the mouse to steer. Press Esc to release it.',mouseStatusKeyboard:'Keyboard control active — use Arrow keys or WASD.',mouseStatusBothInactive:'Keyboard + Mouse — keyboard works now; click the game board once to activate mouse control.',pointerLockFailed:'Mouse control could not be activated. Click the game board again or use Keyboard mode.'},
@@ -362,6 +370,7 @@
 
   function loadJSON(key, fallback){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):fallback; }catch{ return fallback; } }
   function saveJSON(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); return true; }catch{ return false; } }
+  function removeStoredJSON(key){ try{ localStorage.removeItem(key); return true; }catch{ return false; } }
   function t(key, vars={}){ let s=(translations[settings.lang]||translations.en)[key] ?? translations.en[key] ?? key; return s.replace(/\{(\w+)\}/g,(_,k)=>vars[k]??''); }
   function applyTranslations(){
     document.documentElement.lang=settings.lang;
@@ -442,7 +451,7 @@
   }
   function showToast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove('show'),1800); }
   function showScreen(which){ $('#menuScreen').classList.toggle('active',which==='menu'); $('#gameScreen').classList.toggle('active',which==='game'); }
-  function hasSave(){ return !!localStorage.getItem(STORAGE.save); }
+  function hasSave(){ try{ return !!localStorage.getItem(STORAGE.save); }catch{ return false; } }
   function refreshContinue(){ $('#continueBtn').hidden=!hasSave(); }
 
   function getScores(){ const a=loadJSON(STORAGE.scores,[]); return Array.isArray(a)?a:[]; }
@@ -593,7 +602,7 @@
     hideOverlay(); showScreen('game'); updateHUD(); updateMouseStatus(); await maybeFullscreen(); resetLoop(); beep(520,.06,.035,'triangle');
   }
   async function continueSaved(){
-    const saved=loadJSON(STORAGE.save,null); if(!saved || !saved.snake) { localStorage.removeItem(STORAGE.save); refreshContinue(); return; }
+    const saved=loadJSON(STORAGE.save,null); if(!saved || !saved.snake) { removeStoredJSON(STORAGE.save); refreshContinue(); return; }
     const bonus=saved.bonus && Number.isFinite(saved.bonus.remainingMs) && saved.bonus.remainingMs>0 ? {...saved.bonus, expiresAt:Date.now()+saved.bonus.remainingMs} : null;
     state={...saved, paused:false, over:false, recovering:false, pauseStartedAt:0, lives:Number.isFinite(saved.lives)?saved.lives:START_LIVES, nextDir:saved.nextDir||saved.dir, foodsEaten:Number.isFinite(saved.foodsEaten)?saved.foodsEaten:0, bonus, stepMs:Math.max(MIN_STEP_MS,START_STEP_MS-((saved.level||1)-1)*8)};
     if(!state.food || state.snake.some(s=>sameCell(s,state.food))) state.food=randomFood(state.snake, bonus?[bonus]:[]);
@@ -662,7 +671,7 @@
   function gameOver(){
     if(document.pointerLockElement===canvas) document.exitPointerLock?.();
     state.over=true; state.recovering=false; $('#menuOverlay').style.display=''; beep(180,.16,.05,'sawtooth'); setTimeout(()=>beep(120,.20,.045,'sawtooth'),90);
-    addScore(state.player,state.score); localStorage.removeItem(STORAGE.save); refreshContinue(); updateHUD();
+    addScore(state.player,state.score); removeStoredJSON(STORAGE.save); refreshContinue(); updateHUD();
     $('#overlayTitle').textContent=t('gameOver'); $('#overlayText').textContent=t('finalScore',{score:state.score}); $('#gameOverlay').classList.add('show');
   }
   function updateHUD(){ if(!state){ updateBonusBar(); return; } $('#hudPlayer').textContent=state.player;$('#hudScore').textContent=state.score;$('#hudBest').textContent=Math.max(bestScore(),state.score);$('#hudLevel').textContent=state.level;$('#hudLives').textContent='❤️'.repeat(Math.max(0,state.lives??START_LIVES)) || '0'; updateBonusBar(); }
@@ -739,7 +748,9 @@
   function hideOverlay(){ $('#gameOverlay').classList.remove('show');$('#playAgainOverlay').style.display='';$('#menuOverlay').style.display='';$('#menuOverlay').textContent=t('backToMenu'); }
   function saveAndExit(){
     if(!state||state.over)return;
-    const save={player:state.player,snake:state.snake,dir:state.dir,nextDir:state.nextDir,food:state.food,bonus:state.bonus?{x:state.bonus.x,y:state.bonus.y,type:state.bonus.type,durationMs:state.bonus.durationMs,remainingMs:bonusRemainingMs()}:null,foodsEaten:state.foodsEaten||0,score:state.score,level:state.level,lives:state.lives,stepMs:state.stepMs};saveJSON(STORAGE.save,save);refreshContinue();beep(500,.05,.035);showMenu();showToast(t('saved'));
+    const save={player:state.player,snake:state.snake,dir:state.dir,nextDir:state.nextDir,food:state.food,bonus:state.bonus?{x:state.bonus.x,y:state.bonus.y,type:state.bonus.type,durationMs:state.bonus.durationMs,remainingMs:bonusRemainingMs()}:null,foodsEaten:state.foodsEaten||0,score:state.score,level:state.level,lives:state.lives,stepMs:state.stepMs};
+    if(!saveJSON(STORAGE.save,save)){ beep(160,.08,.045,'sawtooth'); showToast(t('saveFailed')); return; }
+    refreshContinue();beep(500,.05,.035);showMenu();showToast(t('saved'));
   }
   function exitWithoutSave(){
     if(!state){showMenu();return;} if(!confirm(t('exitConfirm')))return; showMenu();
@@ -757,15 +768,28 @@
   $('#pauseBtn').addEventListener('click',togglePause); $('#saveExitBtn').addEventListener('click',saveAndExit); $('#exitNoSaveBtn').addEventListener('click',exitWithoutSave);
   $('#playAgainOverlay').addEventListener('click',replay); $('#menuOverlay').addEventListener('click',()=>{ if(state?.paused){togglePause();} else showMenu(); });
   let infoReturnFocus=null;
-  function openInfo(){ infoReturnFocus=document.activeElement; $('#infoModal').classList.add('show'); $('#closeInfo').focus(); }
-  function closeInfo(){ $('#infoModal').classList.remove('show'); if(infoReturnFocus?.focus) infoReturnFocus.focus(); infoReturnFocus=null; }
+  function setInfoBackgroundInert(value){ const app=$('.app'); if(app) app.inert=value; }
+  function openInfo(){ infoReturnFocus=document.activeElement; setInfoBackgroundInert(true); $('#infoModal').classList.add('show'); $('#closeInfo').focus(); }
+  function closeInfo(){ $('#infoModal').classList.remove('show'); setInfoBackgroundInert(false); if(infoReturnFocus?.focus) infoReturnFocus.focus(); infoReturnFocus=null; }
   $('#infoTop').addEventListener('click',openInfo);
   $('#closeInfo').addEventListener('click',closeInfo);
   $('#infoModal').addEventListener('click',e=>{if(e.target.id==='infoModal')closeInfo();});
-  $('#infoModal').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeInfo();}});
+  $('#infoModal').addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeInfo(); return; }
+    if(e.key!=='Tab')return;
+    const focusable=[...e.currentTarget.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+      .filter(el=>!el.hidden&&el.getAttribute('aria-hidden')!=='true');
+    if(!focusable.length){ e.preventDefault(); $('#closeInfo').focus(); return; }
+    const first=focusable[0],last=focusable[focusable.length-1];
+    if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
   $$('.dir-btn').forEach(b=>b.addEventListener('pointerdown',()=>{const d=b.dataset.dir; if(d==='up')setDirection(0,-1);if(d==='down')setDirection(0,1);if(d==='left')setDirection(-1,0);if(d==='right')setDirection(1,0);}));
   window.addEventListener('keydown',e=>{
     if(!state||!$('#gameScreen').classList.contains('active'))return;
+    if(e.defaultPrevented)return;
+    const interactive=e.target instanceof Element&&e.target.closest('button,input,select,textarea,a,[role="option"],[role="listbox"]');
+    if(interactive)return;
     const key=e.key.toLowerCase();
     if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d',' '].includes(key))e.preventDefault();
     if(key===' ')togglePause();
