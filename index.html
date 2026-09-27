@@ -4,8 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0b1020" />
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/modern-snake-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/modern-snake-180.png">
 <title>Modern Snake — Free Online Snake Game | Apps & Games</title>
 <meta name="description" content="Play Modern Snake free online with three lives, timed bonus food, keyboard, mouse and touch controls, saved progress and a local leaderboard.">
+<meta name="keywords" content="Modern Snake, Snake game, free online game, browser game, touch game, Apps & Games">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://modernsnake.appsandgames.org/">
 <meta property="og:type" content="website">
@@ -26,6 +30,7 @@
   "name":"Modern Snake",
   "url":"https://modernsnake.appsandgames.org/",
   "description":"A free modern Snake browser game with three lives, timed bonus food, saved progress, local leaderboard and multiple control methods.",
+  "image":"https://appsandgames.org/assets/social/modern-snake.jpg",
   "applicationCategory":"GameApplication",
   "gamePlatform":["Web browser","Desktop","Mobile"],
   "operatingSystem":"Any",
@@ -50,6 +55,7 @@
   body{min-height:100vh;min-height:100dvh}
   button,input,select{font:inherit}
   button{border:0;cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--accent2);outline-offset:3px}
   .app{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px clamp(14px,3vw,28px);position:relative;z-index:5}
   .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.4px}
@@ -134,6 +140,14 @@
   /* Apps & Games standard Info / Donations */
   #infoModal .modal-card{width:min(800px,100%);max-height:90dvh;overflow:auto}
   .snake-info-section{margin-top:18px}
+  .snake-about{padding:16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035)}
+  .snake-about h3:first-child{margin-top:0}
+  .snake-about-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+  .snake-about-meta{padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.035)}
+  .snake-about-meta strong{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+  .snake-about-meta span{font-weight:850}
+  .snake-privacy{padding:10px 11px;border-radius:12px;background:rgba(77,201,255,.06);border:1px solid rgba(77,201,255,.18)}
+  .snake-portal-link{display:inline-flex;margin-top:4px;color:var(--accent2);font-weight:850;text-decoration:none}
   .snake-charity{padding:15px 16px;border:1px solid rgba(99,245,164,.24);border-radius:16px;background:rgba(99,245,164,.055)}
   .snake-charity strong{display:block;color:var(--accent);font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px}
   .snake-charity p{margin:7px 0;color:#dbe7f7}
@@ -145,7 +159,7 @@
   .snake-payment-action{display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:12px;text-decoration:none;font-weight:900;color:#052013;background:linear-gradient(90deg,var(--accent),var(--accent2));text-align:center;padding:9px 12px}.snake-payment-card.stripe .snake-payment-action{background:linear-gradient(90deg,#ffd76a,#ffb15f)}
   .snake-payment-note{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.45}
   .snake-crypto-list{display:flex;flex-direction:column;gap:8px}.snake-crypto-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.03)}.snake-crypto-code{color:var(--accent2);font-weight:900;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.snake-crypto-address{min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#b9ffd8;overflow-wrap:anywhere;user-select:text}.snake-copy-btn{min-width:78px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--text);font-size:11px;font-weight:850}.snake-copy-btn.copied{color:var(--accent);border-color:rgba(99,245,164,.45);background:rgba(99,245,164,.09)}
-  @media(max-width:640px){.snake-payment-grid{grid-template-columns:1fr}.snake-crypto-row{grid-template-columns:52px minmax(0,1fr)}.snake-copy-btn{grid-column:2;justify-self:end}}
+  @media(max-width:640px){.snake-about-grid{grid-template-columns:1fr}.snake-payment-grid{grid-template-columns:1fr}.snake-crypto-row{grid-template-columns:52px minmax(0,1fr)}.snake-copy-btn{grid-column:2;justify-self:end}}
 
 </style>
 
@@ -158,7 +172,7 @@
   <header class="topbar">
     <div class="brand"><div class="brand-mark" aria-hidden="true"></div><span>Modern Snake</span></div>
     <div class="top-actions">
-      <select id="languageSelect" class="lang" aria-label="Language">
+      <select id="languageSelect" class="lang" aria-label="Language" data-ag-language-menu>
         <option value="en">English</option><option value="hr">Hrvatski</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="es">Español</option>
       </select>
       <button id="soundTop" class="icon-btn" type="button" title="Sound">🔊</button>
@@ -226,10 +240,10 @@
               </div>
             </div>
             <div class="mobile-controls" aria-label="Mobile controls">
-              <button class="dir-btn" data-dir="up" type="button">▲</button>
-              <button class="dir-btn" data-dir="left" type="button">◀</button>
-              <button class="dir-btn" data-dir="down" type="button">▼</button>
-              <button class="dir-btn" data-dir="right" type="button">▶</button>
+              <button class="dir-btn" data-dir="up" type="button" aria-label="Up" data-i18n-aria="directionUp">▲</button>
+              <button class="dir-btn" data-dir="left" type="button" aria-label="Left" data-i18n-aria="directionLeft">◀</button>
+              <button class="dir-btn" data-dir="down" type="button" aria-label="Down" data-i18n-aria="directionDown">▼</button>
+              <button class="dir-btn" data-dir="right" type="button" aria-label="Right" data-i18n-aria="directionRight">▶</button>
             </div>
           </div>
           <aside class="card game-side">
@@ -252,7 +266,7 @@
 
 <div id="infoModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
   <div class="modal-card">
-    <div class="modal-head"><h2 id="infoTitle">Information / Donations</h2><button id="closeInfo" class="close" type="button">×</button></div>
+    <div class="modal-head"><h2 id="infoTitle">Information / Donations</h2><button id="closeInfo" class="close" type="button" aria-label="Close information" data-i18n-aria="closeInformation">×</button></div>
     <div id="infoContent" class="info-text"></div>
   </div>
 </div>
@@ -291,7 +305,31 @@
     it:{lives:'Vite',goalLabel:'Obiettivo:',goalBrief:'Mangia il cibo dorato, fai crescere il serpente e ottieni più punti possibile.',livesLabel:'Vite:',livesBrief:'Inizi con 3 vite. Colpire un muro o il proprio corpo costa una vita.',bonusLabel:'Bonus:',bonusBrief:'Il cibo bonus temporaneo appare per pochi secondi. Il cuore dà una vita extra, la stella dà +50 punti.',lifeLost:'Vita persa!',livesRemaining:'Vite rimaste: {lives}',wallHit:'Hai colpito il muro.',selfHit:'Hai colpito il tuo corpo.',infoTitle:'Informazioni / Donazioni',howToPlayTitle:'Obiettivo del gioco',howToPlayInfo:'Mangia il cibo dorato per far crescere il serpente e ottenere più punti possibile. Il gioco diventa gradualmente più veloce con l’aumentare del livello.',lifeRulesTitle:'Vite e collisioni',lifeRulesInfo:'Ogni nuova partita inizia con 3 vite. Colpire un muro o il proprio corpo costa una vita. Dopo aver perso una vita, il serpente riparte dal centro mentre punteggio e livello vengono mantenuti. La partita termina quando perdi tutte e 3 le vite.',bonusTitle:'Cibo bonus',bonusInfo:'Il cibo bonus temporaneo può apparire dopo diversi cibi normali e rimane visibile solo per pochi secondi. Un cuore concede +1 vita. Se hai già tutte le vite, il cuore assegna invece +100 punti. Una stella concede +50 punti. Anche il cibo bonus conta come cibo, quindi il serpente cresce quando lo raccogli.',controlInfoTitle:'Metodi di controllo',controlInfo:'Su computer o laptop controlla il serpente con i tasti freccia o WASD. Premi Spazio per mettere in pausa o riprendere. Su smartphone e tablet scorri direttamente sul campo di gioco oppure usa i pulsanti direzionali sullo schermo.',donationsTitle:'Donazioni',donationLine1:'L’applicazione è gratuita, ma le donazioni sono benvenute.',donationLine2:'Una parte delle donazioni ricevute sarà destinata a varie organizzazioni benefiche; la parte maggiore sarà donata a istituzioni che si occupano di bambini privi di adeguate cure genitoriali.',donateTo:'Puoi effettuare donazioni a:',cardPayment:'Pagamento con carta (Stripe)',cryptoWallet:'Portafoglio crypto',bonusBarLabel:'Bonus:',bonusTimeLeft:'scompare tra {time}s',bonusLifeName:'Vita extra',bonusScoreName:'Punti +50',bonusAppeared:'È apparso un cibo bonus!',bonusLifeToast:'+1 vita',bonusLifeFullToast:'Vite piene: +100 punti',bonusScoreToast:'+50 punti bonus'},
     es:{lives:'Vidas',goalLabel:'Objetivo:',goalBrief:'Come la comida dorada, haz crecer la serpiente y consigue tantos puntos como puedas.',livesLabel:'Vidas:',livesBrief:'Empiezas con 3 vidas. Chocar contra una pared o tu propio cuerpo cuesta una vida.',bonusLabel:'Bonus:',bonusBrief:'La comida bonus temporal aparece durante unos segundos. El corazón da una vida extra y la estrella aporta +50 puntos.',lifeLost:'¡Vida perdida!',livesRemaining:'Vidas restantes: {lives}',wallHit:'Has chocado contra la pared.',selfHit:'Has chocado contra tu propio cuerpo.',infoTitle:'Información / Donaciones',howToPlayTitle:'Objetivo del juego',howToPlayInfo:'Come la comida dorada para hacer crecer la serpiente y conseguir tantos puntos como sea posible. El juego se vuelve gradualmente más rápido a medida que subes de nivel.',lifeRulesTitle:'Vidas y colisiones',lifeRulesInfo:'Cada nueva partida comienza con 3 vidas. Chocar contra una pared o tu propio cuerpo cuesta una vida. Después de perder una vida, la serpiente vuelve a empezar desde el centro y se conservan la puntuación y el nivel. La partida termina cuando pierdes las 3 vidas.',bonusTitle:'Comida bonus',bonusInfo:'La comida bonus temporal puede aparecer después de varias comidas normales y solo permanece visible durante unos segundos. Un corazón otorga +1 vida. Si ya tienes todas las vidas, ese corazón da +100 puntos en su lugar. Una estrella otorga +50 puntos. La comida bonus también cuenta como comida, así que la serpiente crece cuando la recoges.',controlInfoTitle:'Métodos de control',controlInfo:'En un ordenador o portátil, controla la serpiente con las flechas o WASD. Pulsa Espacio para pausar o continuar. En teléfonos y tabletas, desliza el dedo directamente sobre el tablero o usa los botones de dirección en pantalla.',donationsTitle:'Donaciones',donationLine1:'La aplicación es gratuita, pero las donaciones son bienvenidas.',donationLine2:'Una parte de las donaciones recibidas se destinará a diversas organizaciones benéficas; la mayor parte se donará a instituciones que atienden a niños sin una atención parental adecuada.',donateTo:'Puedes realizar donaciones a:',cardPayment:'Pago con tarjeta (Stripe)',cryptoWallet:'Monedero cripto',bonusBarLabel:'Bonus:',bonusTimeLeft:'desaparece en {time}s',bonusLifeName:'Vida extra',bonusScoreName:'Puntos +50',bonusAppeared:'¡Ha aparecido comida bonus!',bonusLifeToast:'+1 vida',bonusLifeFullToast:'Vidas completas: +100 puntos',bonusScoreToast:'+50 puntos bonus'}
   };
+  const accessibilityTranslations = {
+    en:{directionUp:'Up',directionLeft:'Left',directionDown:'Down',directionRight:'Right',closeInformation:'Close information'},
+    hr:{directionUp:'Gore',directionLeft:'Lijevo',directionDown:'Dolje',directionRight:'Desno',closeInformation:'Zatvori informacije'},
+    de:{directionUp:'Oben',directionLeft:'Links',directionDown:'Unten',directionRight:'Rechts',closeInformation:'Informationen schließen'},
+    it:{directionUp:'Su',directionLeft:'Sinistra',directionDown:'Giù',directionRight:'Destra',closeInformation:'Chiudi informazioni'},
+    es:{directionUp:'Arriba',directionLeft:'Izquierda',directionDown:'Abajo',directionRight:'Derecha',closeInformation:'Cerrar información'}
+  };
+  const infoStandardTranslations = {
+    en:{infoAppSummary:'A modern browser edition of the classic Snake game with three lives, timed bonus food and several control methods.',infoFeaturesTitle:'Main features',infoFeaturesText:'Three lives, progressive speed, timed heart and star bonuses, save and continue, local Top 10, sound, fullscreen, keyboard, mouse and touch controls.',infoVersionLabel:'Version',infoVersionValue:'Web',infoPublisherLabel:'Publisher',infoPriceLabel:'Price',infoFreeValue:'Free',infoPrivacyLabel:'Privacy',infoPrivacyText:'Settings, saved game and leaderboard data are stored locally in this browser with localStorage. No Apps & Games account is required.',infoPortalLink:'Open Apps & Games'},
+    hr:{infoAppSummary:'Moderna preglednička verzija klasične igre Snake s tri života, vremenski ograničenom bonus hranom i više načina upravljanja.',infoFeaturesTitle:'Glavne funkcije',infoFeaturesText:'Tri života, postupno ubrzavanje, vremenski ograničeni bonusi srca i zvjezdice, spremanje i nastavak igre, lokalni Top 10, zvuk, puni zaslon te upravljanje tipkovnicom, mišem i dodirom.',infoVersionLabel:'Verzija',infoVersionValue:'Web',infoPublisherLabel:'Izdavač',infoPriceLabel:'Cijena',infoFreeValue:'Besplatno',infoPrivacyLabel:'Privatnost',infoPrivacyText:'Postavke, spremljena igra i rang-lista čuvaju se lokalno u ovom pregledniku putem localStoragea. Apps & Games račun nije potreban.',infoPortalLink:'Otvori Apps & Games'},
+    de:{infoAppSummary:'Eine moderne Browser-Version des klassischen Snake-Spiels mit drei Leben, zeitlich begrenztem Bonusfutter und mehreren Steuerungsmethoden.',infoFeaturesTitle:'Hauptfunktionen',infoFeaturesText:'Drei Leben, steigendes Tempo, zeitlich begrenzte Herz- und Sternboni, Speichern und Fortsetzen, lokale Top 10, Ton, Vollbild sowie Tastatur-, Maus- und Touch-Steuerung.',infoVersionLabel:'Version',infoVersionValue:'Web',infoPublisherLabel:'Herausgeber',infoPriceLabel:'Preis',infoFreeValue:'Kostenlos',infoPrivacyLabel:'Datenschutz',infoPrivacyText:'Einstellungen, Spielstand und Bestenliste werden mit localStorage lokal in diesem Browser gespeichert. Ein Apps-&-Games-Konto ist nicht erforderlich.',infoPortalLink:'Apps & Games öffnen'},
+    it:{infoAppSummary:'Una moderna versione browser del classico Snake con tre vite, cibo bonus temporaneo e diversi metodi di controllo.',infoFeaturesTitle:'Funzioni principali',infoFeaturesText:'Tre vite, velocità progressiva, bonus temporanei cuore e stella, salvataggio e ripresa, Top 10 locale, audio, schermo intero e controlli da tastiera, mouse e touch.',infoVersionLabel:'Versione',infoVersionValue:'Web',infoPublisherLabel:'Editore',infoPriceLabel:'Prezzo',infoFreeValue:'Gratis',infoPrivacyLabel:'Privacy',infoPrivacyText:'Impostazioni, partita salvata e classifica vengono memorizzate localmente in questo browser tramite localStorage. Non è richiesto un account Apps & Games.',infoPortalLink:'Apri Apps & Games'},
+    es:{infoAppSummary:'Una versión moderna para navegador del clásico Snake con tres vidas, comida bonus temporal y varios métodos de control.',infoFeaturesTitle:'Funciones principales',infoFeaturesText:'Tres vidas, velocidad progresiva, bonus temporales de corazón y estrella, guardar y continuar, Top 10 local, sonido, pantalla completa y controles de teclado, ratón y táctiles.',infoVersionLabel:'Versión',infoVersionValue:'Web',infoPublisherLabel:'Editor',infoPriceLabel:'Precio',infoFreeValue:'Gratis',infoPrivacyLabel:'Privacidad',infoPrivacyText:'Los ajustes, la partida guardada y la clasificación se almacenan localmente en este navegador mediante localStorage. No se necesita una cuenta de Apps & Games.',infoPortalLink:'Abrir Apps & Games'}
+  };
   Object.keys(extraTranslations).forEach(lang => Object.assign(translations[lang], extraTranslations[lang]));
+  Object.keys(accessibilityTranslations).forEach(lang => Object.assign(translations[lang], accessibilityTranslations[lang]));
+  const storageSafetyTranslations = {
+    en:{saveFailed:'Saving failed. Your game is still open.'},
+    hr:{saveFailed:'Spremanje nije uspjelo. Igra je i dalje otvorena.'},
+    de:{saveFailed:'Speichern fehlgeschlagen. Das Spiel bleibt geöffnet.'},
+    it:{saveFailed:'Salvataggio non riuscito. La partita resta aperta.'},
+    es:{saveFailed:'Error al guardar. La partida sigue abierta.'}
+  };
+  Object.keys(infoStandardTranslations).forEach(lang => Object.assign(translations[lang], infoStandardTranslations[lang]));
+  Object.keys(storageSafetyTranslations).forEach(lang => Object.assign(translations[lang], storageSafetyTranslations[lang]));
 
   const controlTranslations = {
     en:{tip:'Choose Keyboard, Mouse, or both on computers. Mouse control needs one click on the game board to activate. On mobile, swipe or use the on-screen controls.',controlMode:'Control',controlKeyboard:'Keyboard',controlMouse:'Mouse',controlBoth:'Keyboard + Mouse',controlInfoTitle:'Control methods',controlInfo:'On a computer or laptop you can choose Keyboard, Mouse, or Keyboard + Mouse in the main menu. Keyboard uses Arrow keys or WASD. For Mouse control, start or continue a game and click the game board once. The browser then activates Pointer Lock: the cursor disappears and moving the mouse up, down, left or right steers the snake in that direction without further clicking. Press Esc to release the mouse. In Mouse mode the snake waits while Pointer Lock is inactive; in Keyboard + Mouse mode the keyboard remains usable. Space pauses or resumes. On phones and tablets, swipe on the game board or use the on-screen direction buttons.',mouseStatusInactive:'Mouse control ready — click the game board once to activate it.',mouseStatusActive:'Mouse control active — move the mouse to steer. Press Esc to release it.',mouseStatusKeyboard:'Keyboard control active — use Arrow keys or WASD.',mouseStatusBothInactive:'Keyboard + Mouse — keyboard works now; click the game board once to activate mouse control.',pointerLockFailed:'Mouse control could not be activated. Click the game board again or use Keyboard mode.'},
@@ -331,12 +369,14 @@
   const mouseControlAvailable = typeof canvas.requestPointerLock === 'function' && window.matchMedia?.('(pointer:fine)').matches !== false;
 
   function loadJSON(key, fallback){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):fallback; }catch{ return fallback; } }
-  function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function saveJSON(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); return true; }catch{ return false; } }
+  function removeStoredJSON(key){ try{ localStorage.removeItem(key); return true; }catch{ return false; } }
   function t(key, vars={}){ let s=(translations[settings.lang]||translations.en)[key] ?? translations.en[key] ?? key; return s.replace(/\{(\w+)\}/g,(_,k)=>vars[k]??''); }
   function applyTranslations(){
     document.documentElement.lang=settings.lang;
     $$('[data-i18n]').forEach(el=>{ const key=el.dataset.i18n; el.textContent=t(key); });
     $$('[data-i18n-placeholder]').forEach(el=>{ el.placeholder=t(el.dataset.i18nPlaceholder); });
+    $$('[data-i18n-aria]').forEach(el=>{ el.setAttribute('aria-label',t(el.dataset.i18nAria)); });
     if(state?.paused) $('#pauseBtn').textContent=t('resume'); else $('#pauseBtn').textContent=t('pause');
     renderLeaderboard();
     renderInfo();
@@ -411,7 +451,7 @@
   }
   function showToast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove('show'),1800); }
   function showScreen(which){ $('#menuScreen').classList.toggle('active',which==='menu'); $('#gameScreen').classList.toggle('active',which==='game'); }
-  function hasSave(){ return !!localStorage.getItem(STORAGE.save); }
+  function hasSave(){ try{ return !!localStorage.getItem(STORAGE.save); }catch{ return false; } }
   function refreshContinue(){ $('#continueBtn').hidden=!hasSave(); }
 
   function getScores(){ const a=loadJSON(STORAGE.scores,[]); return Array.isArray(a)?a:[]; }
@@ -452,6 +492,18 @@
     const walletHtml=wallets.map(([coin,address])=>`<div class="snake-crypto-row"><div class="snake-crypto-code">${coin}</div><div class="snake-crypto-address">${address}</div><button type="button" class="snake-copy-btn" data-address="${address}">${i.copy}</button></div>`).join('');
     content.innerHTML=`
       <div id="snake-standard-info">
+        <div class="snake-about">
+          <h3>🐍 Modern Snake</h3>
+          <p>${t('infoAppSummary')}</p>
+          <div class="snake-about-grid">
+            <div class="snake-about-meta"><strong>${t('infoVersionLabel')}</strong><span>${t('infoVersionValue')}</span></div>
+            <div class="snake-about-meta"><strong>${t('infoPublisherLabel')}</strong><span>Apps & Games</span></div>
+            <div class="snake-about-meta"><strong>${t('infoPriceLabel')}</strong><span>${t('infoFreeValue')}</span></div>
+          </div>
+          <h3>✨ ${t('infoFeaturesTitle')}</h3><p>${t('infoFeaturesText')}</p>
+          <p class="snake-privacy"><strong>${t('infoPrivacyLabel')}:</strong> ${t('infoPrivacyText')}</p>
+          <a class="snake-portal-link" href="https://appsandgames.org/" target="_blank" rel="noopener noreferrer">${t('infoPortalLink')} ↗</a>
+        </div>
         <h3>🎯 ${t('howToPlayTitle')}</h3><p>${t('howToPlayInfo')}</p>
         <h3>❤️ ${t('lifeRulesTitle')}</h3><p>${t('lifeRulesInfo')}</p>
         <h3>⭐ ${t('bonusTitle')}</h3><p>${t('bonusInfo')}</p>
@@ -550,7 +602,7 @@
     hideOverlay(); showScreen('game'); updateHUD(); updateMouseStatus(); await maybeFullscreen(); resetLoop(); beep(520,.06,.035,'triangle');
   }
   async function continueSaved(){
-    const saved=loadJSON(STORAGE.save,null); if(!saved || !saved.snake) { localStorage.removeItem(STORAGE.save); refreshContinue(); return; }
+    const saved=loadJSON(STORAGE.save,null); if(!saved || !saved.snake) { removeStoredJSON(STORAGE.save); refreshContinue(); return; }
     const bonus=saved.bonus && Number.isFinite(saved.bonus.remainingMs) && saved.bonus.remainingMs>0 ? {...saved.bonus, expiresAt:Date.now()+saved.bonus.remainingMs} : null;
     state={...saved, paused:false, over:false, recovering:false, pauseStartedAt:0, lives:Number.isFinite(saved.lives)?saved.lives:START_LIVES, nextDir:saved.nextDir||saved.dir, foodsEaten:Number.isFinite(saved.foodsEaten)?saved.foodsEaten:0, bonus, stepMs:Math.max(MIN_STEP_MS,START_STEP_MS-((saved.level||1)-1)*8)};
     if(!state.food || state.snake.some(s=>sameCell(s,state.food))) state.food=randomFood(state.snake, bonus?[bonus]:[]);
@@ -619,7 +671,7 @@
   function gameOver(){
     if(document.pointerLockElement===canvas) document.exitPointerLock?.();
     state.over=true; state.recovering=false; $('#menuOverlay').style.display=''; beep(180,.16,.05,'sawtooth'); setTimeout(()=>beep(120,.20,.045,'sawtooth'),90);
-    addScore(state.player,state.score); localStorage.removeItem(STORAGE.save); refreshContinue(); updateHUD();
+    addScore(state.player,state.score); removeStoredJSON(STORAGE.save); refreshContinue(); updateHUD();
     $('#overlayTitle').textContent=t('gameOver'); $('#overlayText').textContent=t('finalScore',{score:state.score}); $('#gameOverlay').classList.add('show');
   }
   function updateHUD(){ if(!state){ updateBonusBar(); return; } $('#hudPlayer').textContent=state.player;$('#hudScore').textContent=state.score;$('#hudBest').textContent=Math.max(bestScore(),state.score);$('#hudLevel').textContent=state.level;$('#hudLives').textContent='❤️'.repeat(Math.max(0,state.lives??START_LIVES)) || '0'; updateBonusBar(); }
@@ -696,7 +748,9 @@
   function hideOverlay(){ $('#gameOverlay').classList.remove('show');$('#playAgainOverlay').style.display='';$('#menuOverlay').style.display='';$('#menuOverlay').textContent=t('backToMenu'); }
   function saveAndExit(){
     if(!state||state.over)return;
-    const save={player:state.player,snake:state.snake,dir:state.dir,nextDir:state.nextDir,food:state.food,bonus:state.bonus?{x:state.bonus.x,y:state.bonus.y,type:state.bonus.type,durationMs:state.bonus.durationMs,remainingMs:bonusRemainingMs()}:null,foodsEaten:state.foodsEaten||0,score:state.score,level:state.level,lives:state.lives,stepMs:state.stepMs};saveJSON(STORAGE.save,save);refreshContinue();beep(500,.05,.035);showMenu();showToast(t('saved'));
+    const save={player:state.player,snake:state.snake,dir:state.dir,nextDir:state.nextDir,food:state.food,bonus:state.bonus?{x:state.bonus.x,y:state.bonus.y,type:state.bonus.type,durationMs:state.bonus.durationMs,remainingMs:bonusRemainingMs()}:null,foodsEaten:state.foodsEaten||0,score:state.score,level:state.level,lives:state.lives,stepMs:state.stepMs};
+    if(!saveJSON(STORAGE.save,save)){ beep(160,.08,.045,'sawtooth'); showToast(t('saveFailed')); return; }
+    refreshContinue();beep(500,.05,.035);showMenu();showToast(t('saved'));
   }
   function exitWithoutSave(){
     if(!state){showMenu();return;} if(!confirm(t('exitConfirm')))return; showMenu();
@@ -713,10 +767,29 @@
   $('#fullscreenTop').addEventListener('click',toggleFullscreen); $('#fullscreenSwitch').addEventListener('click',toggleFullscreenPref);
   $('#pauseBtn').addEventListener('click',togglePause); $('#saveExitBtn').addEventListener('click',saveAndExit); $('#exitNoSaveBtn').addEventListener('click',exitWithoutSave);
   $('#playAgainOverlay').addEventListener('click',replay); $('#menuOverlay').addEventListener('click',()=>{ if(state?.paused){togglePause();} else showMenu(); });
-  $('#infoTop').addEventListener('click',()=>$('#infoModal').classList.add('show')); $('#closeInfo').addEventListener('click',()=>$('#infoModal').classList.remove('show')); $('#infoModal').addEventListener('click',e=>{if(e.target.id==='infoModal')e.currentTarget.classList.remove('show');});
+  let infoReturnFocus=null;
+  function setInfoBackgroundInert(value){ const app=$('.app'); if(app) app.inert=value; }
+  function openInfo(){ infoReturnFocus=document.activeElement; setInfoBackgroundInert(true); $('#infoModal').classList.add('show'); $('#closeInfo').focus(); }
+  function closeInfo(){ $('#infoModal').classList.remove('show'); setInfoBackgroundInert(false); if(infoReturnFocus?.focus) infoReturnFocus.focus(); infoReturnFocus=null; }
+  $('#infoTop').addEventListener('click',openInfo);
+  $('#closeInfo').addEventListener('click',closeInfo);
+  $('#infoModal').addEventListener('click',e=>{if(e.target.id==='infoModal')closeInfo();});
+  $('#infoModal').addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeInfo(); return; }
+    if(e.key!=='Tab')return;
+    const focusable=[...e.currentTarget.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+      .filter(el=>!el.hidden&&el.getAttribute('aria-hidden')!=='true');
+    if(!focusable.length){ e.preventDefault(); $('#closeInfo').focus(); return; }
+    const first=focusable[0],last=focusable[focusable.length-1];
+    if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
   $$('.dir-btn').forEach(b=>b.addEventListener('pointerdown',()=>{const d=b.dataset.dir; if(d==='up')setDirection(0,-1);if(d==='down')setDirection(0,1);if(d==='left')setDirection(-1,0);if(d==='right')setDirection(1,0);}));
   window.addEventListener('keydown',e=>{
     if(!state||!$('#gameScreen').classList.contains('active'))return;
+    if(e.defaultPrevented)return;
+    const interactive=e.target instanceof Element&&e.target.closest('button,input,select,textarea,a,[role="option"],[role="listbox"]');
+    if(interactive)return;
     const key=e.key.toLowerCase();
     if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d',' '].includes(key))e.preventDefault();
     if(key===' ')togglePause();
@@ -776,5 +849,7 @@
   settings.lang=translations[settings.lang]?settings.lang:'en'; if(!mouseControlAvailable && settings.controlMode!=='keyboard') settings.controlMode='keyboard'; saveJSON(STORAGE.settings,settings); syncSettingsUI();applyTranslations();refreshContinue();renderLeaderboard();draw();
 })();
 </script>
+<script src="./ag-language-menu.js"></script>
+<script src="./pwa.js"></script>
 </body>
 </html>
