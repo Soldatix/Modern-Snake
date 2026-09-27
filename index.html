@@ -158,7 +158,7 @@
   <header class="topbar">
     <div class="brand"><div class="brand-mark" aria-hidden="true"></div><span>Modern Snake</span></div>
     <div class="top-actions">
-      <select id="languageSelect" class="lang" aria-label="Language">
+      <select id="languageSelect" class="lang" aria-label="Language" data-ag-language-menu>
         <option value="en">English</option><option value="hr">Hrvatski</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="es">Español</option>
       </select>
       <button id="soundTop" class="icon-btn" type="button" title="Sound">🔊</button>
@@ -776,5 +776,6 @@
   settings.lang=translations[settings.lang]?settings.lang:'en'; if(!mouseControlAvailable && settings.controlMode!=='keyboard') settings.controlMode='keyboard'; saveJSON(STORAGE.settings,settings); syncSettingsUI();applyTranslations();refreshContinue();renderLeaderboard();draw();
 })();
 </script>
+<script src="./ag-language-menu.js"></script>
 </body>
 </html>
