@@ -39,6 +39,13 @@ No external libraries are required. Open `index.html` in a modern browser.
 ### Saved settings
 The selected language, sound preference, fullscreen preference, control mode and player name are stored with `localStorage` and restored on the next launch.
 
+
+### Credits
+
+If you use our source code to create your own version, we'd appreciate a mention in its About / Info section:
+
+**Based on Modern Snake by Apps & Games — [appsandgames.org](https://appsandgames.org/)**
+
 ---
 
 ## 🇭🇷 Hrvatski
@@ -74,6 +81,13 @@ The selected language, sound preference, fullscreen preference, control mode and
 
 ### Spremljene postavke
 Odabrani jezik, zvuk, postavka punog zaslona, način upravljanja i ime igrača spremaju se putem `localStorage` i automatski vraćaju pri sljedećem pokretanju.
+
+
+### Zasluge
+
+Ako koristiš naš izvorni kod za vlastitu verziju igre, bili bismo zahvalni da nas spomeneš u odjeljku O aplikaciji / Info:
+
+**Temeljeno na igri Modern Snake autora Apps & Games — [appsandgames.org](https://appsandgames.org/)**
 
 ---
 
@@ -111,6 +125,13 @@ Odabrani jezik, zvuk, postavka punog zaslona, način upravljanja i ime igrača s
 ### Gespeicherte Einstellungen
 Sprache, Ton, Vollbild-Präferenz, Steuerungsmodus und Spielername werden über `localStorage` gespeichert und beim nächsten Start wiederhergestellt.
 
+
+### Danksagung
+
+Wenn du unseren Quellcode für eine eigene Version verwendest, würden wir uns über einen Hinweis unter Über / Info freuen:
+
+**Basierend auf Modern Snake von Apps & Games — [appsandgames.org](https://appsandgames.org/)**
+
 ---
 
 ## 🇮🇹 Italiano
@@ -147,6 +168,13 @@ Sprache, Ton, Vollbild-Präferenz, Steuerungsmodus und Spielername werden über 
 ### Impostazioni salvate
 Lingua, audio, preferenza schermo intero, modalità di controllo e nome giocatore vengono salvati tramite `localStorage` e ripristinati all'avvio successivo.
 
+
+### Riconoscimenti
+
+Se utilizzi il nostro codice sorgente per creare una tua versione del gioco, apprezzeremmo una menzione nella sezione Informazioni / Info:
+
+**Basato su Modern Snake di Apps & Games — [appsandgames.org](https://appsandgames.org/)**
+
 ---
 
 ## 🇪🇸 Español
@@ -182,6 +210,13 @@ Lingua, audio, preferenza schermo intero, modalità di controllo e nome giocator
 
 ### Ajustes guardados
 El idioma, el sonido, la preferencia de pantalla completa, el modo de control y el nombre del jugador se guardan mediante `localStorage` y se restauran en el siguiente inicio.
+
+
+### Reconocimientos
+
+Si utilizas nuestro código fuente para crear tu propia versión del juego, agradeceríamos una mención en la sección Acerca de / Información:
+
+**Basado en Modern Snake de Apps & Games — [appsandgames.org](https://appsandgames.org/)**
 
 ---
 
