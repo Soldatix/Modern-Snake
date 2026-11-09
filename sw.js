@@ -1,9 +1,10 @@
 const CACHE_PREFIX='modern-snake-';
-const CACHE_NAME=CACHE_PREFIX+'2026-09-27-v3';
+const CACHE_NAME=CACHE_PREFIX+'2026-11-09-ad-v4';
 const CORE=[
   './index.html',
   './ag-language-menu.js',
   './pwa.js',
+  './snake-adsterra-loader.js',
   './manifest.webmanifest',
   './icons/modern-snake-180.png',
   './icons/modern-snake-192.png',
