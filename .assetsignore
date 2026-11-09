@@ -1,0 +1,8 @@
+# Serve only the Modern Snake static website from the repository root.
+.git/
+.github/
+README.md
+wrangler.jsonc
+.assetsignore
+*.md
+*.mjs
