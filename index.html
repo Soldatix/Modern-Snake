@@ -161,7 +161,25 @@
   .snake-crypto-list{display:flex;flex-direction:column;gap:8px}.snake-crypto-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.03)}.snake-crypto-code{color:var(--accent2);font-weight:900;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.snake-crypto-address{min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#b9ffd8;overflow-wrap:anywhere;user-select:text}.snake-copy-btn{min-width:78px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--text);font-size:11px;font-weight:850}.snake-copy-btn.copied{color:var(--accent);border-color:rgba(99,245,164,.45);background:rgba(99,245,164,.09)}
   @media(max-width:640px){.snake-about-grid{grid-template-columns:1fr}.snake-payment-grid{grid-template-columns:1fr}.snake-crypto-row{grid-template-columns:52px minmax(0,1fr)}.snake-copy-btn{grid-column:2;justify-self:end}}
 
+
+  /* Shared Adsterra pilot: only the menu has a normal-flow banner.
+     Mobile 320px fits inside the viewport; gameplay never loses space. */
+  #snake-ad-area[hidden], #snake-ad-area .snake-ad-unit[hidden] { display:none !important; }
+  #snake-ad-area { display:flex; justify-content:center; align-items:center;
+    width:100%; max-width:100%; padding:8px 0 5px; flex:0 0 auto; }
+  .snake-ad-unit { display:flex; flex-direction:column; align-items:center;
+    max-width:100%; min-width:0; text-align:center; }
+  .snake-ad-label { font:11px/1.4 system-ui,sans-serif; color:var(--muted);
+    padding-bottom:6px; }
+  .snake-privacy-footer { display:flex; justify-content:center; text-align:center;
+    align-items:center; min-height:34px; padding:5px 12px 12px; color:var(--muted); }
+  .snake-privacy-footer .ag-privacy-footer-control {
+    color:var(--accent2); cursor:pointer; padding:6px 12px; }
+  body.snake-game-active #snake-ad-area,
+  body.snake-game-active .snake-privacy-footer { display:none !important; }
 </style>
+<link rel="stylesheet" href="https://appsandgames.org/privacy-choice.css">
+<script src="https://appsandgames.org/privacy-choice.js" defer></script>
 
 <meta property="og:image:width" content="1200">
 
@@ -262,6 +280,16 @@
       </section>
     </div>
   </main>
+  <!-- Menu-only Adsterra: in document flow below the game cards. -->
+  <section id="snake-ad-area" class="snake-ad-area" aria-label="Advertisement" hidden>
+    <div class="snake-ad-unit" data-size="728x90" hidden>
+      <script src="./snake-adsterra-loader.js" data-unit="desktop"></script>
+    </div>
+    <div class="snake-ad-unit" data-size="320x50" hidden>
+      <script src="./snake-adsterra-loader.js" data-unit="mobile"></script>
+    </div>
+  </section>
+  <footer class="footer-links snake-privacy-footer" aria-label="Privacy choices"></footer>
 </div>
 
 <div id="infoModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
@@ -450,7 +478,7 @@
     }catch{}
   }
   function showToast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(el._timer); el._timer=setTimeout(()=>el.classList.remove('show'),1800); }
-  function showScreen(which){ $('#menuScreen').classList.toggle('active',which==='menu'); $('#gameScreen').classList.toggle('active',which==='game'); }
+  function showScreen(which){ document.body.classList.toggle('snake-game-active',which==='game'); $('#menuScreen').classList.toggle('active',which==='menu'); $('#gameScreen').classList.toggle('active',which==='game'); }
   function hasSave(){ try{ return !!localStorage.getItem(STORAGE.save); }catch{ return false; } }
   function refreshContinue(){ $('#continueBtn').hidden=!hasSave(); }
 
