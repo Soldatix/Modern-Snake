@@ -1,7 +1,22 @@
 const CACHE_PREFIX='modern-snake-';
-const CACHE_NAME=CACHE_PREFIX+'2026-11-09-ad-v4';
+const CACHE_NAME=CACHE_PREFIX+'2026-11-26-seo-offline-v5';
+const APP_ENTRY = new URL('./', self.location.href).href;
+const APP_PATH = new URL(APP_ENTRY).pathname;
+const LEGACY_PATH = new URL('index.html', APP_ENTRY).pathname;
+const entryRequest = () => new Request(APP_ENTRY, { cache: 'reload', redirect: 'error' });
+const cachedEntry = async () => (await caches.open(CACHE_NAME)).match(APP_ENTRY);
+async function navigationNetworkFirst(request) {
+  let response;
+  try { response = await fetch(request); }
+  catch { return (await cachedEntry()) || Response.error(); }
+  if (response.ok && !response.redirected && response.url === APP_ENTRY &&
+      (response.headers.get('content-type') || '').toLowerCase().includes('text/html')) {
+    try { await (await caches.open(CACHE_NAME)).put(APP_ENTRY, response.clone()); } catch {}
+  }
+  return response;
+}
 const CORE=[
-  './index.html',
+  entryRequest(),
   './ag-language-menu.js',
   './pwa.js',
   './snake-adsterra-loader.js',
@@ -39,18 +54,6 @@ function networkFirst(request){
     .catch(()=>caches.match(request));
 }
 
-function navigationNetworkFirst(request){
-  return fetch(request)
-    .then(async(response)=>{
-      if(response&&response.ok){
-        const cache=await caches.open(CACHE_NAME);
-        await cache.put('./index.html',response.clone());
-      }
-      return response;
-    })
-    .catch(()=>caches.match('./index.html'));
-}
-
 self.addEventListener('fetch',(event)=>{
   const request=event.request;
   if(request.method!=='GET')return;
@@ -58,6 +61,7 @@ self.addEventListener('fetch',(event)=>{
   if(url.origin!==self.location.origin)return;
 
   if(request.mode==='navigate'){
+    if(url.pathname!==APP_PATH&&url.pathname!==LEGACY_PATH)return;
     event.respondWith(navigationNetworkFirst(request));
     return;
   }
